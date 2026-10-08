@@ -241,6 +241,15 @@ footer .iast-inline { font-family: var(--f-iast); }
 .sign { display: grid; justify-items: center; gap: 2px; padding: 10px 6px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
 .sign-d { font-family: var(--f-deva); font-size: 1.9rem; line-height: 1.3; color: var(--ink); }
 @media (max-width: 480px) { .other-cells { grid-template-columns: repeat(2, minmax(0, 1fr)); } .akc-d { font-size: 1.9rem; } }
+.akc-spk { color: var(--muted); line-height: 0; margin-top: 2px; }
+.akc-main:hover .akc-spk { color: var(--ink); }
+.vowel-sign { border: 1px dashed var(--line); background: transparent; border-radius: 6px; padding: 2px 8px; justify-self: center; }
+.vowel-sign:hover { border-color: var(--ink); }
+.row-play { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 2px 10px; font-size: 0.75rem; color: var(--muted); }
+.alpha-sec h3 .row-play, .other-group h4 .row-play { margin: 0 0 0 10px; vertical-align: 2px; font-weight: 400; }
+.row-play:hover { color: var(--ink); border-color: var(--ink); }
+button.sign { font: inherit; color: inherit; cursor: pointer; }
+button.sign:hover { border-color: var(--ink); background: var(--ink-soft); }
 .credit { margin: 0; color: var(--muted); font-size: 0.78rem; }
 a { color: var(--ink); }
 footer { display: grid; gap: 6px; }
@@ -1220,7 +1229,7 @@ function pronBlock(en) {
     <div class="pron-row">
       <span class="pron-label">발음</span>
       <span class="ipa">[${esc(syl.map(s => s.ipa).join("."))}]</span>
-      <button type="button" class="btn speak" data-speak="${en.d}"${speechReady ? "" : " hidden"}>
+      <button type="button" class="btn speak" data-speak="${en.d}"${canSpeak() ? "" : " hidden"}>
         <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M3 7.5h3l4-3.5v12l-4-3.5H3z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M13 7a4 4 0 0 1 0 6M15.5 4.8a7 7 0 0 1 0 10.4"/></svg>
         듣기</button>
     </div>
@@ -1238,18 +1247,29 @@ function pickVoice() {
     speechVoice = ["sa", "hi", "mr", "ne"].map(l => vs.find(v => v.lang.toLowerCase().startsWith(l))).find(Boolean) || null;
   } catch { speechVoice = null; }
   speechReady = !!speechVoice;
-  document.querySelectorAll("[data-speak]").forEach(b => { b.hidden = !speechReady; });
+  document.querySelectorAll(".speak, .spk, .row-play").forEach(b => { b.hidden = !canSpeak(); });
 }
 if ("speechSynthesis" in window) {
   pickVoice();
   try { speechSynthesis.addEventListener("voiceschanged", pickVoice); } catch {}
 }
+const canSpeak = () => speechReady || !window.claude?.use;
+let ttsAudio = null;
 function speak(text) {
+  if (speechReady) {
+    try {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.voice = speechVoice; u.lang = speechVoice?.lang || "hi-IN"; u.rate = 0.7;
+      speechSynthesis.speak(u);
+    } catch {}
+    return;
+  }
+  if (window.claude?.use) return;   // claude.ai 안에서는 바깥 소리 파일을 받을 수 없음
   try {
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.voice = speechVoice; u.lang = speechVoice?.lang || "hi-IN"; u.rate = 0.7;
-    speechSynthesis.speak(u);
+    ttsAudio?.pause();
+    ttsAudio = new Audio("https://translate.google.com/translate_tts?ie=UTF-8&tl=hi&client=tw-ob&ttsspeed=0.6&q=" + encodeURIComponent(text.slice(0, 180)));
+    ttsAudio.play().catch(() => {});
   } catch {}
 }
 
@@ -1379,6 +1399,7 @@ function alphaCell(iast, deva, ko, tip, speakText) {
       <span class="akc-i">${esc(iast)}</span>
       <span class="akc-k">${esc(ko)}</span>
       ${IPA[iast] ? `<span class="akc-ipa">[${IPA[iast]}]</span>` : ""}
+      <span class="akc-spk"${canSpeak() ? "" : " hidden"}><svg class="spk" viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M3 7.5h3l4-3.5v12l-4-3.5H3z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M13 7a4 4 0 0 1 0 6M15.5 4.8a7 7 0 0 1 0 10.4"/></svg></span>
     </button>
     ${ex ? `<button type="button" class="akc-ex" data-goto="${ex.key}"><span lang="sa">${ex.d}</span> ${esc(ex.i)} · ${esc(ex.k.split(/[,;(]/)[0].trim())}</button>` : `<span class="akc-ex empty"></span>`}
   </div>`;
@@ -1390,16 +1411,16 @@ function renderAlphabet() {
   $("alphabet").innerHTML = `
     <header class="alpha-head">
       <h2>데바나가리 자모표 <span lang="sa">वर्णमाला</span></h2>
-      <p>산스크리트 자모는 발음하는 위치에 따라 줄을 맞춰 늘어놓습니다(varṇamālā). 글자를 누르면 소리를 들을 수 있고${speechReady ? "" : "(이 기기에 힌디어 음성이 있을 때)"}, 아래 예시 단어를 누르면 사전으로 갑니다. 한글은 비슷한 소리일 뿐이니 발음기호와 요령을 함께 보세요.</p>
+      <p>산스크리트 자모는 발음하는 위치에 따라 줄을 맞춰 늘어놓습니다(varṇamālā). ${canSpeak() ? "스피커 표시가 있는 글자를 누르면 소리를 들을 수 있고(힌디어 음성으로 읽어서 산스크리트 발음과 조금 다를 수 있어요)" : "이 화면에서는 소리를 낼 수 없어요(기기에 힌디어 음성이 없음)"}, 아래 예시 단어를 누르면 사전으로 갑니다. 한글은 비슷한 소리일 뿐이니 발음기호와 요령을 함께 보세요.</p>
     </header>
 
     <section class="alpha-sec">
-      <h3>모음 <span class="sub">스바라 svara · 13자</span></h3>
+      <h3>모음 <span class="sub">스바라 svara · 13자</span><button type="button" class="row-play" data-speak="${ALPHA_VOWELS.map(v => v[1]).join(", ")}"${canSpeak() ? "" : " hidden"}><svg class="spk" viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M3 7.5h3l4-3.5v12l-4-3.5H3z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M13 7a4 4 0 0 1 0 6M15.5 4.8a7 7 0 0 1 0 10.4"/></svg> 모음 전체 듣기</button></h3>
       <p class="alpha-note">단어 첫머리에는 왼쪽의 독립 글자를, 자음 뒤에서는 오른쪽처럼 기호를 붙여 씁니다(예: क ka에 붙인 모양). 짧은 모음 a는 자음에 이미 들어 있어서 기호가 없습니다.</p>
       <div class="vowel-grid">${ALPHA_VOWELS.map(([i, d, sign, ko, tip]) => `
         <div class="vowel">
           ${alphaCell(i, d, ko, tip)}
-          <div class="vowel-sign"><span lang="sa">${sign}</span><span>k${esc(i)}</span></div>
+          <button type="button" class="vowel-sign" data-speak="${sign}" title="자음 뒤에 붙인 모양 (눌러서 듣기)"><span lang="sa">${sign}</span><span>k${esc(i)}</span></button>
           <p class="vowel-tip">${esc(tip)}</p>
         </div>`).join("")}
       </div>
@@ -1410,10 +1431,10 @@ function renderAlphabet() {
       <p class="alpha-note">모든 자음에는 짧은 모음 a가 붙어 있어 क는 'ka'로 읽습니다. 가로로는 숨과 목청의 울림이, 세로로는 혀와 입술의 위치가 같습니다.</p>
       <div class="cons-wrap"><table class="cons">
         <thead><tr><th></th>${ALPHA_HEADS.map(([n, how, ko]) => `<th><b>${n}</b><span>${how}</span><span class="ko">${ko}</span></th>`).join("")}</tr></thead>
-        <tbody>${ALPHA_ROWS.map(([name, where, cells]) => `<tr><th scope="row"><b>${name}</b><span>${where}</span></th>${cells.map(([i, d, ko]) => `<td>${alphaCell(i, d, ko + " (" + i + "a)")}</td>`).join("")}</tr>`).join("")}</tbody>
+        <tbody>${ALPHA_ROWS.map(([name, where, cells]) => `<tr><th scope="row"><b>${name}</b><span>${where}</span><button type="button" class="row-play" data-speak="${cells.map(c => c[1]).join(", ")}"${canSpeak() ? "" : " hidden"}><svg class="spk" viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M3 7.5h3l4-3.5v12l-4-3.5H3z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M13 7a4 4 0 0 1 0 6M15.5 4.8a7 7 0 0 1 0 10.4"/></svg> 줄 듣기</button></th>${cells.map(([i, d, ko]) => `<td>${alphaCell(i, d, ko + " (" + i + "a)")}</td>`).join("")}</tr>`).join("")}</tbody>
       </table></div>
       <div class="others">${ALPHA_OTHERS.map(([name, desc, cells]) => `
-        <div class="other-group"><h4>${name} <span class="sub">${desc}</span></h4>
+        <div class="other-group"><h4>${name} <span class="sub">${desc}</span><button type="button" class="row-play" data-speak="${cells.map(c => c[1]).join(", ")}"${canSpeak() ? "" : " hidden"}><svg class="spk" viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M3 7.5h3l4-3.5v12l-4-3.5H3z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M13 7a4 4 0 0 1 0 6M15.5 4.8a7 7 0 0 1 0 10.4"/></svg> 듣기</button></h4>
           <div class="other-cells">${cells.map(([i, d, ko, tip]) => `<div class="other">${alphaCell(i, d, ko + " (" + i + "a)", tip)}<p class="vowel-tip">${esc(tip)}</p></div>`).join("")}</div>
         </div>`).join("")}
       </div>
@@ -1422,12 +1443,12 @@ function renderAlphabet() {
     <section class="alpha-sec">
       <h3>기호와 자주 보는 합자</h3>
       <div class="sign-grid">${ALPHA_SIGNS.map(([i, sign, sample, ko, tip]) => `
-        <div class="sign">
+        <button type="button" class="sign" data-speak="${sample}">
           <span class="sign-d" lang="sa">${sample}</span>
           <span class="akc-i">${esc(i || "—")}</span>
           <span class="akc-k">${esc(ko)}</span>
           <p class="vowel-tip">${esc(tip)}</p>
-        </div>`).join("")}
+        </button>`).join("")}
       </div>
     </section>`;
 }
