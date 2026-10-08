@@ -50,6 +50,8 @@ h1 .deva { font-family: var(--f-deva); font-weight: 400; font-size: 1.9rem; colo
   flex: 1; min-width: 0; font: inherit; font-size: 1.05rem; padding: 12px 14px;
   border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--fg);
 }
+.searchbar .btn-primary { padding: 0 20px; font-weight: 600; }
+.searchbar .btn-primary:hover { color: var(--bg); }
 .searchbar input:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; border-color: transparent; }
 button { font: inherit; cursor: pointer; color: inherit; }
 .btn { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 0 14px; font-size: 0.9rem; white-space: nowrap; }
@@ -218,7 +220,7 @@ footer p { margin: 0; }
 
   <div class="searchbar" translate="no" lang="ko">
     <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="dharma · धर्म · 다르마 · 자비 · peace">
-    <button class="btn" id="random" type="button">아무 단어</button>
+    <button class="btn btn-primary" id="search-btn" type="button">검색</button>
   </div>
   <p class="hint" translate="no" lang="ko">데바나가리, IAST 로마자(발음 구별 기호 없이 <code>santi</code>, <code>shanti</code>, <code>krishna</code>도 됨)로 사전 표제어 21만여 개를 찾습니다. 문장 속 형태(예: <code>vidyālayasya</code>, <code>gacchati</code>)를 치면 사전 기본형을 찾아 줍니다. 한국어 낱말(예: 학교, 물, 어머니)과 영어 단어는 세 사전의 영어 뜻풀이에서도 찾습니다(<span class="src src-en">≈ 영어</span> 표시). 영어 풀이는 크롬의 <b>한국어로 번역</b>(주소창 번역 아이콘 또는 마우스 오른쪽 버튼)으로 한국어로 볼 수 있습니다.</p>
 
@@ -1333,7 +1335,7 @@ function scoreCore(en, Q) {
     else if (w.length >= 2 && en.k.includes(w)) s = 50;
   }
   if (qk.length >= 3 && en.xKey && en.xKey.includes(qk)) s = Math.max(s, 45);
-  if (enRe && enRe.test(en.en)) s = Math.max(s, 30);
+  if (enRe && enRe.test(en.en)) s = Math.max(s, 45);   // 한국어 풀이가 있는 핵심 어휘를 사전 영어 뜻 결과(최고 40)보다 앞에
   return s;
 }
 // 정렬된 로마자 키에서 접두어 찾기(이진 탐색)
@@ -1567,6 +1569,12 @@ function filtered() {
     VIA.clear();
     if (DICT && mask) {
       const words = Q.isHangul ? koEnglish(Q.raw) : Q.enList;
+      // 한국어로 찾을 때, 영어 뜻이 맞는 핵심 어휘(예: 교사 → teacher → ācārya)도 앞쪽에
+      if (Q.isHangul && words && words.length) {
+        const have = new Set(res.filter(r => typeof r[2] !== "number").map(r => r[2].key));
+        const re = new RegExp("\\b(" + words.join("|") + ")");
+        for (const en of coreList) if (!have.has(en.key) && re.test(en.en)) res.push([45, 0, en]);
+      }
       const hits = words && words.length ? englishHits(words, Q.isHangul ? "any" : "all") : null;
       if (hits) {
         const seenNow = new Set(res.filter(r => typeof r[2] === "number").map(r => r[2]));
@@ -1937,14 +1945,14 @@ function scrollToCurrent() {
 let lastSel = null;
 function render() {
   const res = filtered();
-  if (state.sel === null && res.items.length) state.sel = res.items[0].key;
+  if ((state.sel === null || state.autoSel) && res.items.length) { state.sel = res.items[0].key; state.autoSel = true; }
   renderList(res);
   if (state.sel !== lastSel || !$("detail").firstElementChild) { renderDetail(); lastSel = state.sel; }
   document.querySelectorAll("#cats .chip").forEach(b => b.setAttribute("aria-pressed", b.dataset.cat === state.cat));
   document.querySelectorAll("#varna button").forEach(b => b.setAttribute("aria-pressed", b.dataset.letter === state.letter));
 }
 function select(key) {
-  state.sel = key; lastSel = null; render();
+  state.sel = key; state.autoSel = false; lastSel = null; render();
   if (matchMedia("(max-width: 760px)").matches) $("detail").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 function goTo(key) {
@@ -1995,11 +2003,16 @@ $("detail").addEventListener("click", e => {
   const b = e.target.closest("[data-goto]");
   if (b) goTo(b.dataset.goto);
 });
-$("random").addEventListener("click", () => {
-  const useCore = !DICT || Math.random() < 0.4;
-  const key = useCore ? CORE[Math.floor(Math.random() * CORE.length)].key : "h" + Math.floor(Math.random() * DICT.N);
-  goTo(key);
-});
+// 검색 버튼·엔터: 입력한 단어로 바로 찾고 첫 결과를 엶(분류·첫 글자 선택은 풀어서 전체에서 찾음)
+function runSearch() {
+  clearTimeout(typing);
+  state.q = $("q").value; state.cat = "all"; state.letter = ""; state.limit = PAGE_LIMIT; state.sel = null;
+  renderVarna(); lastSel = null; render(); scrollToCurrent();
+  if (matchMedia("(max-width: 760px)").matches) $("list").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+$("search-btn").addEventListener("click", runSearch);
+// 한글 입력 중 엔터는 마지막 글자가 조합 중일 수 있어서, 입력이 확정된 뒤 찾도록 살짝 늦춤
+$("q").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); setTimeout(runSearch, 0); } });
 
 if (/KAKAOTALK/i.test(navigator.userAgent)) {
   $("kakao").hidden = false;
