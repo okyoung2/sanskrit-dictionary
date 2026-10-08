@@ -1396,8 +1396,25 @@ function koEnglish(raw) {
   if (KO_EN[w]) return KO_EN[w];
   // 조사 떼기: 학교를, 물은, 산의 …
   const stripped = w.replace(/(은|는|이|가|을|를|의|에|에서|으로|로|와|과|도)$/, "");
-  return KO_EN[stripped] || [];
+  if (KO_EN[stripped]) return KO_EN[stripped];
+  // 낱말표에 없으면 구글 번역(한→영)으로 영어 낱말을 받아 옴(claude.ai 안에서는 막혀 있어 빈 결과)
+  if (KO_DYN.has(w)) { const v = KO_DYN.get(w); return v === "loading" ? null : v; }
+  KO_DYN.set(w, "loading");
+  fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=ko&tl=en&dt=t&dt=bd&q=" + encodeURIComponent(w))
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      const words = enWords((d?.[0] || []).map(x => x[0]).join(" "));
+      for (const g of d?.[1] || []) {                 // 사전 대역어 중 많이 쓰이는 것(가장 흔한 것의 30% 이상)
+        const entries = g[2] || [], top = entries[0]?.[3] || 0;
+        entries.filter(e => (e[3] || 0) >= top * 0.3).slice(0, 3).forEach(e => words.push(...enWords(e[0])));
+      }
+      return [...new Set(words)].slice(0, 6);
+    })
+    .catch(() => [])
+    .then(ws => { KO_DYN.set(w, ws); if (state.q) render(); });
+  return null;
 }
+const KO_DYN = new Map();   // 구글 번역으로 받은 한국어 → 영어 낱말
 const VIA = new Map();   // 영어 뜻으로 찾은 표제어 → 찾은 영어 낱말
 const sourceCount = h => ((DICT.mask[h] & 3) ? 1 : 0) + ((DICT.mask[h] & 4) ? 1 : 0) + ((DICT.mask[h] & 8) ? 1 : 0);
 function englishHits(words, mode) {   // mode "any"(한국어 동의어 합치기) | "all"(영어 여러 낱말)
@@ -1623,7 +1640,7 @@ const BADGE = it => it.src === "core" ? (it.p === "√" ? '<span class="src">어
 function renderList({ total, items }) {
   renderCount(total);
   if (!items.length) {
-    $("list").innerHTML = `<li class="empty">${state.q && /[가-힣]/.test(state.q) ? (KO_EN ? "이 한국어 낱말은 아직 검색 낱말표에 없습니다. 비슷한 말로 바꾸거나 영어 단어(예: school)로 찾아보세요." : "한국어 낱말표를 불러오는 중…") : "맞는 단어가 없습니다. 철자를 줄이거나 분류·첫 글자 선택을 풀어 보세요."}</li>`;
+    $("list").innerHTML = `<li class="empty">${state.q && /[가-힣]/.test(state.q) ? (KO_DYN.get(state.q.trim().replace(/\s+/g, "")) === "loading" ? "영어 낱말로 바꾸는 중…" : KO_EN ? "이 한국어 낱말은 아직 검색 낱말표에 없습니다. 비슷한 말로 바꾸거나 영어 단어(예: school)로 찾아보세요." : "한국어 낱말표를 불러오는 중…") : "맞는 단어가 없습니다. 철자를 줄이거나 분류·첫 글자 선택을 풀어 보세요."}</li>`;
     return;
   }
   const need = new Set();
