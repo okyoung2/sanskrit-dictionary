@@ -242,6 +242,9 @@ footer .iast-inline { font-family: var(--f-iast); }
 .sign-d { font-family: var(--f-deva); font-size: 1.9rem; line-height: 1.3; color: var(--ink); }
 @media (max-width: 480px) { .other-cells { grid-template-columns: repeat(2, minmax(0, 1fr)); } .akc-d { font-size: 1.9rem; } }
 .akc-spk { color: var(--muted); line-height: 0; margin-top: 2px; }
+.alpha-tip { margin: 0; display: flex; gap: 10px; align-items: flex-start; padding: 12px 16px; border-radius: 8px; background: var(--ink-soft); border: 1px solid var(--ink); font-size: 0.92rem; max-width: 70ch; }
+.alpha-tip .spk { flex: none; color: var(--ink); margin-top: 2px; }
+.alpha-tip b { color: var(--ink); }
 .akc-main:hover .akc-spk { color: var(--ink); }
 .vowel-sign { border: 1px dashed var(--line); background: transparent; border-radius: 6px; padding: 2px 8px; justify-self: center; }
 .vowel-sign:hover { border-color: var(--ink); }
@@ -1411,12 +1414,15 @@ function renderAlphabet() {
   $("alphabet").innerHTML = `
     <header class="alpha-head">
       <h2>데바나가리 자모표 <span lang="sa">वर्णमाला</span></h2>
-      <p>산스크리트 자모는 발음하는 위치에 따라 줄을 맞춰 늘어놓습니다(varṇamālā). ${canSpeak() ? "스피커 표시가 있는 글자를 누르면 소리를 들을 수 있고(힌디어 음성으로 읽어서 산스크리트 발음과 조금 다를 수 있어요)" : "이 화면에서는 소리를 낼 수 없어요(기기에 힌디어 음성이 없음)"}, 아래 예시 단어를 누르면 사전으로 갑니다. 한글은 비슷한 소리일 뿐이니 발음기호와 요령을 함께 보세요.</p>
+      <p>산스크리트 자모는 소리 나는 자리에 따라 줄지어 놓습니다(varṇamālā). 한글 표기는 비슷한 소리일 뿐이니 발음기호와 요령을 함께 보세요.</p>
+      ${canSpeak()
+        ? `<p class="alpha-tip"><svg class="spk" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M3 7.5h3l4-3.5v12l-4-3.5H3z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M13 7a4 4 0 0 1 0 6M15.5 4.8a7 7 0 0 1 0 10.4"/></svg><span><b>글자를 누르면 발음을 들을 수 있어요.</b> 글자 아래의 예시 단어를 누르면 사전에서 그 단어가 열립니다. 소리는 힌디어 음성으로 읽어서 산스크리트 발음과 조금 다를 수 있어요.</span></p>`
+        : `<p class="alpha-tip"><span>이 기기에서는 소리를 낼 수 없어요(힌디어 음성이 없음). 글자 아래의 예시 단어를 누르면 사전에서 그 단어가 열립니다.</span></p>`}
     </header>
 
     <section class="alpha-sec">
-      <h3>모음 <span class="sub">스바라 svara · 13자</span><button type="button" class="row-play" data-speak="${ALPHA_VOWELS.map(v => v[1]).join(", ")}"${canSpeak() ? "" : " hidden"}><svg class="spk" viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M3 7.5h3l4-3.5v12l-4-3.5H3z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M13 7a4 4 0 0 1 0 6M15.5 4.8a7 7 0 0 1 0 10.4"/></svg> 모음 전체 듣기</button></h3>
-      <p class="alpha-note">단어 첫머리에는 왼쪽의 독립 글자를, 자음 뒤에서는 오른쪽처럼 기호를 붙여 씁니다(예: क ka에 붙인 모양). 짧은 모음 a는 자음에 이미 들어 있어서 기호가 없습니다.</p>
+      <h3>모음 <span class="sub">스바라 svara · 13자</span></h3>
+      <p class="alpha-note">단어 첫머리에는 위의 독립 글자를 쓰고, 자음 뒤에서는 아래처럼 모음 기호를 붙여 씁니다(क ka에 붙인 모양). 짧은 모음 a는 자음에 이미 들어 있어서 기호가 없습니다.</p>
       <div class="vowel-grid">${ALPHA_VOWELS.map(([i, d, sign, ko, tip]) => `
         <div class="vowel">
           ${alphaCell(i, d, ko, tip)}
