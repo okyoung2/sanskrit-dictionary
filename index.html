@@ -1,0 +1,1764 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="산스크리트어 사전: 한국어 핵심 어휘와 Apte·Monier-Williams·Edgerton 사전 21만 표제어">
+<meta property="og:title" content="산스크리트 소사전">
+<meta property="og:description" content="데바나가리·로마자로 찾는 산스크리트어 사전. 한국어 핵심 어휘 665개, 사전 표제어 21만여 개.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit&family=Gentium+Book+Plus:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: 검색·분류·자모 색인을 위에, 아래는 목록(좌) + 표제어 상세(우). 좁은 화면에서는 상세 → 목록 순으로 쌓임 */
+:root {
+  --bg: #f3f4f1;
+  --surface: #fbfbf9;
+  --fg: #1d2420;
+  --muted: #5d6862;
+  --line: #d8dcd6;
+  --ink: #2a3d86;        /* 남색 먹 */
+  --ink-soft: #e3e7f4;
+  --turmeric: #b47a0c;   /* 강황 */
+  --f-deva: "Tiro Devanagari Sanskrit", "Noto Serif Devanagari", "Nirmala UI", "Mangal", serif;
+  --f-iast: "Gentium Book Plus", "Gentium Plus", "Charis SIL", "Times New Roman", serif;
+  --f-ui: "IBM Plex Sans KR", "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121614; --surface: #1a1f1c; --fg: #e5e9e4; --muted: #9aa49e; --line: #2e3631;
+    --ink: #a9b7ff; --ink-soft: #232a45; --turmeric: #e3a93c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121614; --surface: #1a1f1c; --fg: #e5e9e4; --muted: #9aa49e; --line: #2e3631;
+  --ink: #a9b7ff; --ink-soft: #232a45; --turmeric: #e3a93c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-ui); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 48px; display: grid; gap: 18px; }
+@media (max-width: 480px) { .wrap { padding-inline: 16px; } }
+
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+h1 { margin: 0; font-size: 1.6rem; font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+h1 .deva { font-family: var(--f-deva); font-weight: 400; font-size: 1.9rem; color: var(--ink); }
+.count { color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+
+.searchbar { display: flex; gap: 8px; }
+.searchbar input {
+  flex: 1; min-width: 0; font: inherit; font-size: 1.05rem; padding: 12px 14px;
+  border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--fg);
+}
+.searchbar input:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; border-color: transparent; }
+button { font: inherit; cursor: pointer; color: inherit; }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 0 14px; font-size: 0.9rem; white-space: nowrap; }
+.btn:hover { border-color: var(--ink); color: var(--ink); }
+button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.hint { color: var(--muted); font-size: 0.82rem; margin-top: -8px; }
+.hint code { font-family: var(--f-iast); font-size: 0.95rem; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 4px 12px; font-size: 0.85rem; }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.chip .n { opacity: 0.6; font-variant-numeric: tabular-nums; margin-left: 4px; font-size: 0.78rem; }
+
+.varna { overflow-x: auto; border-block: 1px solid var(--line); padding-block: 6px; }
+.varna-row { display: flex; gap: 2px; width: max-content; }
+.varna button {
+  font-family: var(--f-deva); font-size: 1.25rem; line-height: 1; width: 2.1rem; height: 2.3rem;
+  border: 0; background: transparent; border-radius: 4px; color: var(--fg); padding-top: 4px;
+}
+.varna button.all { font-family: var(--f-ui); font-size: 0.85rem; font-weight: 600; width: auto; padding: 0 12px; padding-top: 0; }
+.varna button:hover { background: var(--ink-soft); }
+.varna button[aria-pressed="true"] { background: var(--turmeric); color: var(--bg); }
+.varna .gap { width: 10px; }
+
+.main { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 760px) { .main { grid-template-columns: minmax(0, 1fr); } .detail { order: -1; } }
+
+.list { position: relative; list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); max-height: 70vh; overflow-y: auto; }
+@media (max-width: 760px) { .list { max-height: none; } }
+.list li + li { border-top: 1px solid var(--line); }
+.item { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; width: 100%; text-align: left; border: 0; background: transparent; padding: 10px 14px; }
+.item:hover { background: var(--ink-soft); }
+.item[aria-current="true"] { background: var(--ink-soft); box-shadow: inset 3px 0 0 var(--turmeric); }
+.item .d { font-family: var(--f-deva); font-size: 1.3rem; line-height: 1.5; grid-row: span 2; align-self: center; min-width: 4.2rem; }
+.item .i { font-family: var(--f-iast); font-size: 1.02rem; }
+.item .k { color: var(--muted); font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.empty { padding: 28px 16px; color: var(--muted); text-align: center; }
+
+.detail { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 28px; display: grid; gap: 18px; min-width: 0; }
+@media (max-width: 480px) { .detail { padding: 20px; } }
+.hw { display: grid; gap: 4px; }
+.hw .d { font-family: var(--f-deva); font-size: clamp(2.6rem, 8vw, 3.6rem); line-height: 1.35; color: var(--ink); overflow-wrap: anywhere; }
+.hw .i { font-family: var(--f-iast); font-size: 1.5rem; font-style: italic; }
+.hw .h { color: var(--muted); font-size: 0.95rem; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.tag { font-size: 0.78rem; letter-spacing: 0.03em; padding: 2px 9px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); }
+.tag.pos { border-color: var(--turmeric); color: var(--turmeric); }
+dl { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 10px 18px; }
+dt { color: var(--muted); font-size: 0.8rem; letter-spacing: 0.04em; padding-top: 3px; }
+dd { margin: 0; min-width: 0; }
+dd.ko { font-size: 1.08rem; }
+dd.en { font-family: var(--f-iast); font-size: 1.05rem; }
+dd .deva-inline { font-family: var(--f-deva); font-size: 1.15rem; }
+dd .iast-inline { font-family: var(--f-iast); font-style: italic; }
+@media (max-width: 420px) { dl { grid-template-columns: minmax(0, 1fr); gap: 2px; } dd { margin-bottom: 8px; } }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.actions .btn { padding: 7px 14px; }
+.status { color: var(--muted); font-size: 0.82rem; align-self: center; }
+
+footer { color: var(--muted); font-size: 0.8rem; border-top: 1px solid var(--line); padding-top: 14px; }
+footer .iast-inline { font-family: var(--f-iast); }
+@media (prefers-reduced-motion: no-preference) { .item, .chip, .varna button { transition: background-color .12s, color .12s; } }
+
+.item .src { font-family: var(--f-ui); font-size: 0.68rem; letter-spacing: 0.05em; color: var(--muted); border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; margin-left: 8px; vertical-align: 2px; }
+.list .more { padding: 10px; text-align: center; }
+.list .more .btn { padding: 7px 14px; }
+.auto { font-size: 0.72rem; border: 1px solid var(--line); border-radius: 3px; padding: 0 5px; margin-left: 4px; vertical-align: 1px; }
+.xref { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.xref-label { color: var(--muted); font-size: 0.8rem; letter-spacing: 0.04em; margin-right: 4px; }
+.xref .btn { padding: 4px 12px; font-family: var(--f-iast); font-size: 0.98rem; }
+.deva-inline { font-family: var(--f-deva); }
+.apte-body { font-family: var(--f-iast); font-size: 1.06rem; line-height: 1.75; overflow-wrap: break-word; min-width: 0; max-width: 68ch; }
+.apte-body i.sa { color: var(--ink); }
+.apte-body b { font-family: var(--f-ui); font-size: 0.78rem; font-weight: 600; color: var(--turmeric); border: 1px solid currentColor; border-radius: 3px; padding: 0 4px; margin-inline: 2px; vertical-align: 1px; }
+.apte-body .comp { display: block; margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--line); font-family: var(--f-ui); font-size: 0.8rem; letter-spacing: 0.06em; color: var(--muted); }
+.apte-body .see { margin: 0 0 8px; font-family: var(--f-ui); font-size: 0.88rem; color: var(--muted); }
+.apte-body .loading { color: var(--muted); font-family: var(--f-ui); font-size: 0.9rem; margin: 0; }
+.pron { display: grid; gap: 8px; }
+.pron-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.pron-label { color: var(--muted); font-size: 0.8rem; letter-spacing: 0.04em; }
+.ipa { font-family: var(--f-iast); font-size: 1.15rem; overflow-wrap: anywhere; }
+.speak { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; font-size: 0.85rem; }
+.syl { display: flex; flex-wrap: wrap; gap: 4px; }
+.syl .s { display: grid; justify-items: center; padding: 2px 8px 4px; border-radius: 4px; background: var(--bg); border: 1px solid var(--line); }
+.syl .m { font-size: 0.85rem; line-height: 1.1; color: var(--muted); }
+.syl .g .m { color: var(--turmeric); font-weight: 700; }
+.syl .t { font-family: var(--f-iast); font-size: 1.05rem; }
+.pron-tip { margin: 0; color: var(--muted); font-size: 0.84rem; }
+.write { border-top: 1px solid var(--line); padding-top: 14px; }
+.write summary { cursor: pointer; font-weight: 600; font-size: 0.95rem; }
+.write summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.write-sub { font-weight: 400; color: var(--muted); font-size: 0.8rem; margin-left: 6px; }
+.ak-list { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 12px; }
+.ak { display: grid; grid-template-columns: 4.2rem minmax(0, 1fr); gap: 14px; align-items: start; }
+.ak-glyph { font-family: var(--f-deva); font-size: 2.6rem; line-height: 1.35; text-align: center; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; }
+.ak-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.ak-steps li { display: grid; grid-template-columns: 1.5rem 2.8rem minmax(0, 1fr); gap: 8px; align-items: center; }
+.st-n { width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--turmeric); color: var(--bg); font-size: 0.75rem; font-weight: 600; display: grid; place-items: center; font-variant-numeric: tabular-nums; }
+.st-g { font-family: var(--f-deva); font-size: 1.5rem; text-align: center; }
+.st-t { font-size: 0.88rem; min-width: 0; }
+.write-end { display: grid; grid-template-columns: 1.5rem minmax(0, 1fr); gap: 8px; align-items: center; margin: 12px 0 0; font-size: 0.88rem; }
+.ko-trans { display: grid; gap: 10px; padding: 16px 18px; border-radius: 8px; background: var(--ink-soft); min-width: 0; }
+.ko-head { display: flex; gap: 8px; align-items: center; }
+.ko-title { font-weight: 600; font-size: 0.88rem; letter-spacing: 0.02em; }
+.ko-sum { margin: 0; font-size: 1.12rem; font-weight: 500; }
+.ko-senses { margin: 0; padding-left: 1.5em; display: grid; gap: 6px; }
+.ko-senses li::marker { color: var(--turmeric); font-weight: 600; }
+.ko-note { margin: 0; color: var(--muted); font-size: 0.88rem; }
+.ko-trans .btn { justify-self: start; padding: 7px 14px; }
+.btn-primary { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.btn-primary:hover { color: var(--bg); opacity: 0.9; }
+.ko-trans .btn-quiet { padding: 3px 10px; font-size: 0.8rem; }
+.chip-sep { width: 1px; align-self: stretch; background: var(--line); margin-inline: 4px; }
+.chip-dict { border-style: dashed; }
+.chip-dict[aria-pressed="true"] { border-style: solid; }
+.item .src-ko { color: var(--ink); border-color: var(--ink); }
+.src-tabs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid var(--line); }
+.src-tab { border: 1px solid transparent; border-bottom: 0; background: transparent; padding: 7px 14px; border-radius: 6px 6px 0 0; font-size: 0.9rem; color: var(--muted); margin-bottom: -1px; }
+.src-tab[aria-selected="true"] { color: var(--fg); background: var(--surface); border-color: var(--line); font-weight: 600; }
+.src-tab .n { font-size: 0.75rem; color: var(--muted); margin-left: 4px; font-weight: 400; }
+.dict-body { font-family: var(--f-iast); font-size: 1.04rem; line-height: 1.7; overflow-wrap: break-word; min-width: 0; max-width: 68ch; }
+.dict-body i.sa { color: var(--ink); }
+.dict-body b { font-family: var(--f-ui); font-size: 0.78rem; font-weight: 600; color: var(--turmeric); border: 1px solid currentColor; border-radius: 3px; padding: 0 4px; margin-inline: 2px; vertical-align: 1px; }
+.dict-body .comp { display: block; margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--line); font-family: var(--f-ui); font-size: 0.8rem; letter-spacing: 0.06em; color: var(--muted); }
+.dict-body .see { margin: 0 0 8px; font-family: var(--f-ui); font-size: 0.88rem; color: var(--muted); }
+.dict-body .lex { font-family: var(--f-ui); font-size: 0.8rem; color: var(--turmeric); }
+.dict-body .rec + .rec { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.mw-list { margin: 0; padding-left: 1.4em; display: grid; gap: 6px; }
+.mw-list li::marker { color: var(--muted); font-size: 0.8em; }
+.sub-hw { font-weight: 700; color: var(--ink); }
+.loading { color: var(--muted); font-family: var(--f-ui); font-size: 0.9rem; margin: 0; }
+.comp-note { margin: 0 0 10px; font-size: 0.9rem; color: var(--muted); }
+.linkish { border: 0; background: none; padding: 0; color: var(--ink); text-decoration: underline; font-family: var(--f-iast); font-size: 1rem; }
+.ko-from { color: var(--muted); font-size: 0.78rem; }
+#dict-area { display: grid; gap: 12px; min-width: 0; }
+.kakao { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 12px 16px; border-radius: 8px; background: var(--ink-soft); border: 1px solid var(--ink); }
+.kakao p { margin: 0; flex: 1 1 16rem; font-size: 0.9rem; }
+.kakao .btn { padding: 7px 14px; text-decoration: none; }
+.orig { border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; }
+.orig summary { cursor: pointer; font-size: 0.85rem; color: var(--muted); }
+.orig-sub { font-size: 0.78rem; margin-left: 6px; opacity: 0.8; }
+.orig[open] summary { margin-bottom: 8px; }
+.credit { margin: 0; color: var(--muted); font-size: 0.78rem; }
+a { color: var(--ink); }
+footer { display: grid; gap: 6px; }
+footer p { margin: 0; }
+</style>
+<style>body{margin:0}</style>
+<title>산스크리트 소사전</title>
+</head>
+<body>
+<div class="wrap">
+  <div class="kakao" id="kakao" hidden translate="no" lang="ko">
+    <p>카카오톡 안에서는 한국어 번역 기능을 쓸 수 없어요. 크롬이나 사파리로 열어 주세요.</p>
+    <a class="btn btn-primary" id="kakao-open" href="#">다른 브라우저로 열기</a>
+  </div>
+  <header translate="no" lang="ko">
+    <h1><span class="deva">शब्दकोश</span> 산스크리트 소사전</h1>
+    <span class="count" id="count"></span>
+  </header>
+
+  <div class="searchbar" translate="no" lang="ko">
+    <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="dharma · धर्म · 다르마 · 자비 · peace">
+    <button class="btn" id="random" type="button">아무 단어</button>
+  </div>
+  <p class="hint" translate="no" lang="ko">데바나가리, IAST 로마자(발음 구별 기호 없이 <code>santi</code>, <code>shanti</code>, <code>krishna</code>도 됨)로 사전 표제어 21만여 개를 찾습니다. 한글 음역·한국어 뜻은 핵심 어휘에서, 영어 단어는 Apte 사전의 첫 뜻풀이에서 찾습니다. 영어 풀이는 크롬의 <b>한국어로 번역</b>(주소창 번역 아이콘 또는 마우스 오른쪽 버튼)으로 한국어로 볼 수 있습니다.</p>
+
+  <div class="chips" id="cats" role="group" aria-label="분류" translate="no" lang="ko"></div>
+  <nav class="varna" aria-label="첫 글자" translate="no" lang="ko"><div class="varna-row" id="varna"></div></nav>
+
+  <div class="main">
+    <ul class="list" id="list" aria-label="표제어 목록"></ul>
+    <article class="detail" id="detail" aria-live="polite"></article>
+  </div>
+
+  <footer translate="no" lang="ko"><p>표제어는 산스크리트 자모 순서(<span class="iast-inline">a ā i ī u ū ṛ e ai o au · k kh g gh ṅ · c ch j jh ñ · ṭ ṭh ḍ ḍh ṇ · t th d dh n · p ph b bh m · y r l v · ś ṣ s h</span>)로 정렬됩니다. 명사는 어간형으로 싣고, 주격형이 다른 경우 참고란에 적었습니다.</p>
+    <p>사전 데이터: V. S. Apte, <em>The Practical Sanskrit-English Dictionary</em> (1890) · M. Monier-Williams, <em>A Sanskrit-English Dictionary</em> (1899) · F. Edgerton, <em>Buddhist Hybrid Sanskrit Dictionary</em> (1953). <a href="https://www.sanskrit-lexicon.uni-koeln.de/" target="_blank" rel="noopener">Cologne Digital Sanskrit Dictionaries</a> 디지털판, CC BY-SA 4.0. 사전 표제어의 데바나가리·한글 음역은 자동 변환했고, Apte 합성어의 표제어 형태는 연성 규칙으로 자동으로 만든 것입니다.</p></footer>
+</div>
+
+<script>
+// 데바나가리|IAST|한글 음역|품사|한국어 뜻|영어 뜻|분류|참고
+const RAW = `
+अग्नि|agni|아그니|m.|불; 불의 신 아그니|fire; Agni, god of fire|basic|
+जल|jala|잘라|n.|물|water|basic|
+वायु|vāyu|바유|m.|바람, 공기; 바람의 신|wind, air|basic|
+पृथिवी|pṛthivī|프리티비|f.|땅, 대지|earth|basic|
+आकाश|ākāśa|아카샤|m.|허공, 하늘, 공간|space, sky, ether|basic|
+सूर्य|sūrya|수리야|m.|태양|sun|basic|
+चन्द्र|candra|찬드라|m.|달|moon|basic|
+नक्षत्र|nakṣatra|낙샤트라|n.|별; 달이 머무는 성수(星宿)|star; lunar mansion|basic|
+नदी|nadī|나디|f.|강|river|basic|
+पर्वत|parvata|파르바타|m.|산|mountain|basic|
+वन|vana|바나|n.|숲|forest|basic|
+वृक्ष|vṛkṣa|브리크샤|m.|나무|tree|basic|
+पुष्प|puṣpa|푸슈파|n.|꽃|flower|basic|
+पद्म|padma|파드마|m./n.|연꽃|lotus|basic|
+फल|phala|팔라|n.|열매; 결과, 과보|fruit; result|basic|
+गृह|gṛha|그리하|m./n.|집|house, home|basic|
+ग्राम|grāma|그라마|m.|마을|village|basic|
+नगर|nagara|나가라|n.|도시|city, town|basic|
+मार्ग|mārga|마르가|m.|길, 도(道)|path, way|basic|
+अन्न|anna|안나|n.|음식, 곡식|food, grain|basic|
+दुग्ध|dugdha|두그다|n.|우유|milk|basic|
+मधु|madhu|마두|n.|꿀; (형용사) 달콤한|honey; sweet|basic|
+गो|go|고|m./f.|소|cow, ox|basic|
+अश्व|aśva|아슈바|m.|말(馬)|horse|basic|
+गज|gaja|가자|m.|코끼리|elephant|basic|
+सिंह|siṃha|싱하|m.|사자|lion|basic|
+सर्प|sarpa|사르파|m.|뱀|snake|basic|
+पक्षिन्|pakṣin|팍신|m.|새|bird|basic|주격 단수 pakṣī(पक्षी)
+मत्स्य|matsya|마츠야|m.|물고기|fish|basic|
+मनुष्य|manuṣya|마누시야|m.|사람, 인간|human being|basic|
+पुरुष|puruṣa|푸루샤|m.|사람, 남자; (상키야 철학) 순수 정신|man, person; pure spirit|basic|
+स्त्री|strī|스트리|f.|여자, 아내|woman, wife|basic|
+मातृ|mātṛ|마트리|f.|어머니|mother|basic|주격 단수 mātā(माता)
+पितृ|pitṛ|피트리|m.|아버지; (복수) 조상|father; ancestors|basic|주격 단수 pitā(पिता)
+पुत्र|putra|푸트라|m.|아들|son|basic|
+पुत्री|putrī|푸트리|f.|딸|daughter|basic|
+भ्रातृ|bhrātṛ|브라트리|m.|형제|brother|basic|주격 단수 bhrātā(भ्राता)
+स्वसृ|svasṛ|스바스리|f.|자매|sister|basic|주격 단수 svasā(स्वसा)
+मित्र|mitra|미트라|n./m.|친구, 벗|friend|basic|
+गुरु|guru|구루|m.|스승; (형용사) 무거운|teacher; heavy|basic|
+शिष्य|śiṣya|시시야|m.|제자|disciple, student|basic|
+राजन्|rājan|라잔|m.|왕|king|basic|주격 단수 rājā(राजा)
+देव|deva|데바|m.|신, 천(天)|god, deity|basic|
+देवी|devī|데비|f.|여신|goddess|basic|
+जन|jana|자나|m.|사람, 백성|person, people|basic|
+लोक|loka|로카|m.|세계, 세상, 사람들|world, people|basic|
+काल|kāla|칼라|m.|시간, 때; 죽음|time; death|basic|
+दिन|dina|디나|n.|날, 낮|day|basic|
+रात्रि|rātri|라트리|f.|밤|night|basic|
+वर्ष|varṣa|바르샤|m./n.|해(年); 비|year; rain|basic|
+नामन्|nāman|나만|n.|이름|name|basic|주격 단수 nāma(नाम)
+रूप|rūpa|루파|n.|형태, 모습; (불교) 색(色)|form, shape, appearance|basic|
+शब्द|śabda|샤브다|m.|소리, 말, 단어|sound, word|basic|
+वाच्|vāc|바치|f.|말, 언어, 목소리|speech, voice|basic|주격 단수 vāk(वाक्)
+पुस्तक|pustaka|푸스타카|n.|책|book|basic|
+विद्या|vidyā|비디야|f.|지식, 학문|knowledge, learning|basic|
+सत्य|satya|사티야|n.|진리, 진실; (형용사) 참된|truth; true|basic|
+प्रेमन्|preman|프레만|m./n.|사랑, 애정|love, affection|basic|주격 단수 prema(प्रेम)
+सुख|sukha|수카|n.|즐거움, 행복, 안락|happiness, ease|basic|
+शान्ति|śānti|샨티|f.|평화, 고요|peace, calm|basic|
+जीवन|jīvana|지바나|n.|삶, 생명|life|basic|
+मृत्यु|mṛtyu|므리티유|m.|죽음|death|basic|
+हृदय|hṛdaya|흐리다야|n.|심장, 마음; 핵심|heart; essence|basic|『반야심경』은 Prajñāpāramitāhṛdaya
+शरीर|śarīra|샤리라|n.|몸, 신체; (불교) 사리|body; relics|basic|
+हस्त|hasta|하스타|m.|손|hand|basic|
+पाद|pāda|파다|m.|발; 시구의 한 구(句)|foot; quarter of a verse|basic|
+नेत्र|netra|네트라|n.|눈|eye|basic|
+मुख|mukha|무카|n.|입, 얼굴|mouth, face|basic|
+शिरस्|śiras|시라스|n.|머리|head|basic|
+कर्ण|karṇa|카르나|m.|귀|ear|basic|
+नासिका|nāsikā|나시카|f.|코|nose|basic|
+महत्|mahat|마하트|adj.|큰, 위대한|great, large|basic|합성어 앞에서는 mahā-(महा)
+अल्प|alpa|알파|adj.|작은, 적은|small, little|basic|
+नव|nava|나바|adj.|새로운|new|basic|숫자 9(navan)와 형태가 같음
+शुभ|śubha|슈바|adj.|상서로운, 좋은|auspicious, good|basic|
+सुन्दर|sundara|순다라|adj.|아름다운|beautiful|basic|
+श्वेत|śveta|슈베타|adj.|흰|white|basic|
+कृष्ण|kṛṣṇa|크리슈나|adj.|검은, 어두운|black, dark|basic|비슈누의 화신 크리슈나의 이름이기도 함
+रक्त|rakta|락타|adj.|붉은; (중성명사) 피|red; blood|basic|
+नील|nīla|닐라|adj.|푸른, 짙은 남색의|blue, dark blue|basic|
+अहम्|aham|아함|pron.|나|I|basic|
+त्वम्|tvam|트밤|pron.|너|you|basic|
+सः|saḥ|사하|pron.|그, 그것|he, that|basic|여성 sā(सा), 중성 tat(तत्)
+इदम्|idam|이담|pron.|이것|this|basic|
+च|ca|차|ind.|그리고, ~와|and|basic|연결할 단어 뒤에 놓임
+न|na|나|ind.|아니다|not|basic|
+इति|iti|이티|ind.|~라고 (인용의 끝 표시)|thus (marks a quotation)|basic|
+एव|eva|에바|ind.|바로, 오직, 참으로|only, indeed|basic|
+नमस्|namas|나마스|n.|경배, 절|bow, homage|basic|namaste = namas + te "당신께 경배"
+स्वागत|svāgata|스바가타|n.|환영|welcome|basic|인사말은 svāgatam(स्वागतम्)
+धन्यवाद|dhanyavāda|단야바다|m.|감사|thanks|basic|근대 이후의 표현
+एक|eka|에카|num.|하나, 1|one|num|
+द्वि|dvi|드비|num.|둘, 2|two|num|
+त्रि|tri|트리|num.|셋, 3|three|num|
+चतुर्|catur|차투르|num.|넷, 4|four|num|
+पञ्चन्|pañcan|판찬|num.|다섯, 5|five|num|
+षष्|ṣaṣ|샤시|num.|여섯, 6|six|num|
+सप्तन्|saptan|삽탄|num.|일곱, 7|seven|num|
+अष्टन्|aṣṭan|아슈탄|num.|여덟, 8|eight|num|
+नवन्|navan|나반|num.|아홉, 9|nine|num|
+दशन्|daśan|다샨|num.|열, 10|ten|num|
+विंशति|viṃśati|빔샤티|num.|스물, 20|twenty|num|
+शत|śata|샤타|num.|백, 100|hundred|num|
+सहस्र|sahasra|사하스라|num.|천, 1000|thousand|num|
+कोटि|koṭi|코티|num.|천만, 10,000,000; 끝, 정점|ten million; tip, edge|num|
+शून्य|śūnya|슈니야|adj.|빈; (중성명사) 영(0), 공(空)|empty; zero|num|
+बुद्ध|buddha|붓다|m.|깨달은 이, 부처|the Awakened One|bud|어근 budh '깨어나다'의 과거분사
+बोधि|bodhi|보디|f.|깨달음, 보리(菩提)|awakening, enlightenment|bud|
+बोधिसत्त्व|bodhisattva|보디삿트바|m.|보살(菩薩)|bodhisattva|bud|
+धर्म|dharma|다르마|m.|법(法), 가르침; 의무, 정의|law, duty, teaching|bud|어근 dhṛ '지니다'에서 나옴
+सङ्घ|saṅgha|상가|m.|승가(僧伽), 수행 공동체|community|bud|
+निर्वाण|nirvāṇa|니르바나|n.|열반(涅槃), 불이 꺼짐|extinction, liberation|bud|
+संसार|saṃsāra|삼사라|m.|윤회(輪廻)|cycle of rebirth|bud|
+कर्मन्|karman|카르마|n.|업(業), 행위|action, karma|bud|주격 단수 karma(कर्म)
+दुःख|duḥkha|두카|n.|괴로움, 고(苦)|suffering|bud|
+शून्यता|śūnyatā|슈니야타|f.|공성(空性)|emptiness|bud|
+प्रज्ञा|prajñā|프라즈냐|f.|지혜, 반야(般若)|wisdom, insight|bud|
+करुणा|karuṇā|카루나|f.|연민, 자비, 비(悲)|compassion|bud|
+मैत्री|maitrī|마이트리|f.|자애, 자(慈)|loving-kindness|bud|
+मुदिता|muditā|무디타|f.|함께 기뻐함, 희(喜)|sympathetic joy|bud|
+उपेक्षा|upekṣā|우페크샤|f.|평정, 사(捨)|equanimity|bud|
+ध्यान|dhyāna|디야나|n.|선정(禪定), 명상|meditation|bud|선(禪)은 이 말의 음역
+समाधि|samādhi|사마디|m.|삼매(三昧), 깊은 집중|concentration, absorption|bud|
+शील|śīla|실라|n.|계(戒), 도덕적 행위|morality, precepts|bud|
+पारमिता|pāramitā|파라미타|f.|바라밀(波羅蜜), 완성|perfection|bud|
+सूत्र|sūtra|수트라|n.|실; 경(經); 짧은 금언|thread; scripture; aphorism|bud|
+मन्त्र|mantra|만트라|m.|진언(眞言), 주문|sacred formula|bud|
+अनित्य|anitya|아니티야|adj.|무상(無常)한|impermanent|bud|
+अनात्मन्|anātman|아나트만|m.|무아(無我)|non-self|bud|
+तृष्णा|tṛṣṇā|트리슈나|f.|갈애(渴愛), 목마름|craving, thirst|bud|
+अविद्या|avidyā|아비디야|f.|무명(無明)|ignorance|bud|
+स्कन्ध|skandha|스칸다|m.|온(蘊), 무더기|aggregate|bud|오온: 색·수·상·행·식
+प्रतीत्यसमुत्पाद|pratītyasamutpāda|프라티티야사무트파다|m.|연기(緣起)|dependent origination|bud|
+आर्यसत्य|āryasatya|아리야사티야|n.|성제(聖諦), 거룩한 진리|noble truth|bud|
+तथागत|tathāgata|타타가타|m.|여래(如來)|thus-gone one|bud|
+अर्हत्|arhat|아르하트|m.|아라한(阿羅漢)|worthy one|bud|주격 단수 arhan(अर्हन्)
+भिक्षु|bhikṣu|비크슈|m.|비구, 수행승|monk|bud|
+भिक्षुणी|bhikṣuṇī|비크슈니|f.|비구니|nun|bud|
+विहार|vihāra|비하라|m.|정사(精舍), 사원|monastery|bud|
+स्तूप|stūpa|스투파|m.|탑(塔)|stupa|bud|
+मण्डल|maṇḍala|만달라|n.|원; 만다라|circle; mandala|bud|
+चित्त|citta|치타|n.|마음|mind, heart|bud|
+विज्ञान|vijñāna|비즈냐나|n.|식(識), 인식|consciousness|bud|
+वेदना|vedanā|베다나|f.|수(受), 느낌|feeling, sensation|bud|
+संज्ञा|saṃjñā|삼즈냐|f.|상(想), 지각; 이름|perception; name|bud|
+संस्कार|saṃskāra|삼스카라|m.|행(行), 형성 작용; 잠재 인상|formations; impressions|bud|
+अमिताभ|amitābha|아미타바|m.|아미타불, 무량광(無量光)|Infinite Light, Amitābha|bud|
+अवलोकितेश्वर|avalokiteśvara|아발로키테슈바라|m.|관세음보살|Avalokiteśvara|bud|
+मञ्जुश्री|mañjuśrī|만주슈리|m.|문수보살|Mañjuśrī|bud|
+महायान|mahāyāna|마하야나|n.|대승(大乘), 큰 수레|Great Vehicle|bud|
+वज्र|vajra|바즈라|m./n.|금강(金剛), 벼락|thunderbolt, diamond|bud|
+पुण्य|puṇya|푼야|n.|공덕, 복덕|merit|bud|
+उपाय|upāya|우파야|m.|방편(方便), 수단|skillful means|bud|
+तथता|tathatā|타타타|f.|진여(眞如), 있는 그대로|suchness|bud|
+प्रणिधान|praṇidhāna|프라니다나|n.|서원(誓願); 헌신|vow; devotion|bud|
+योग|yoga|요가|m.|결합, 수행법|union, discipline|yoga|어근 yuj '묶다'에서 나옴
+आसन|āsana|아사나|n.|자세, 앉는 법|posture, seat|yoga|
+प्राण|prāṇa|프라나|m.|숨, 생명 에너지|breath, vital energy|yoga|
+प्राणायाम|prāṇāyāma|프라나야마|m.|호흡 조절|breath control|yoga|
+यम|yama|야마|m.|금계(禁戒), 절제; 죽음의 신 야마|restraint; god of death|yoga|
+नियम|niyama|니야마|m.|권계(勸戒), 지켜야 할 규율|observance|yoga|
+प्रत्याहार|pratyāhāra|프라티야하라|m.|감각의 거두어들임|withdrawal of the senses|yoga|
+धारणा|dhāraṇā|다라나|f.|집중, 마음을 한곳에 묶음|concentration|yoga|
+अहिंसा|ahiṃsā|아힘사|f.|불살생, 비폭력|non-violence|yoga|
+अस्तेय|asteya|아스테야|n.|훔치지 않음|non-stealing|yoga|
+ब्रह्मचर्य|brahmacarya|브라흐마차리야|n.|금욕, 범행(梵行)|celibacy, chaste conduct|yoga|
+अपरिग्रह|aparigraha|아파리그라하|m.|무소유, 탐내지 않음|non-possessiveness|yoga|
+शौच|śauca|샤우차|n.|청정|purity, cleanliness|yoga|
+सन्तोष|santoṣa|산토샤|m.|만족|contentment|yoga|
+तपस्|tapas|타파스|n.|고행; 열|austerity; heat|yoga|
+स्वाध्याय|svādhyāya|스바디야야|m.|경전 공부, 자기 탐구|self-study|yoga|
+ईश्वर|īśvara|이슈바라|m.|주재신, 자재자(自在者)|lord|yoga|
+चक्र|cakra|차크라|n.|바퀴; 에너지 중심|wheel; energy center|yoga|
+नाडी|nāḍī|나디|f.|기맥, 관|channel|yoga|
+कुण्डलिनी|kuṇḍalinī|쿤달리니|f.|똬리 튼 에너지|coiled energy|yoga|
+बन्ध|bandha|반다|m.|묶음, 잠금|lock, bond|yoga|
+मुद्रा|mudrā|무드라|f.|인(印), 수인; 손짓|seal, gesture|yoga|
+दृष्टि|dṛṣṭi|드리슈티|f.|시선; 견해|gaze; view|yoga|
+विन्यास|vinyāsa|빈야사|m.|배열, 동작의 연결|arrangement, sequence|yoga|
+हठ|haṭha|하타|m.|힘, 억셈|force|yoga|하타 요가의 '하타'
+सूर्यनमस्कार|sūryanamaskāra|수리야나마스카라|m.|태양 경배 자세|sun salutation|yoga|
+शवासन|śavāsana|사바사나|n.|송장 자세|corpse pose|yoga|śava(송장) + āsana
+पद्मासन|padmāsana|파드마사나|n.|연꽃 자세, 결가부좌|lotus pose|yoga|
+ताडासन|tāḍāsana|타다사나|n.|산 자세(야자나무 자세)|mountain pose|yoga|
+वृक्षासन|vṛkṣāsana|브릭샤사나|n.|나무 자세|tree pose|yoga|
+भुजङ्गासन|bhujaṅgāsana|부장가사나|n.|코브라 자세|cobra pose|yoga|bhujaṅga = 뱀
+त्रिकोणासन|trikoṇāsana|트리코나사나|n.|삼각 자세|triangle pose|yoga|
+वीरभद्रासन|vīrabhadrāsana|비라바드라사나|n.|전사 자세|warrior pose|yoga|
+ॐ|om|옴|ind.|성음(聖音) 옴|the sacred syllable Om|yoga|a·u·m 세 소리가 합쳐진 것으로 풀이함
+आयुर्वेद|āyurveda|아유르베다|m.|생명의 학문, 인도 전통 의학|science of life|ayur|
+दोष|doṣa|도샤|m.|결함, 허물; (아유르베다) 체질 요소|fault; bodily humor|ayur|
+आत्मन्|ātman|아트만|m.|자아, 참나|self, soul|phil|주격 단수 ātmā(आत्मा)
+ब्रह्मन्|brahman|브라흐만|n.|우주의 근본 원리, 범(梵)|the Absolute|phil|남성 brahmā는 창조신
+माया|māyā|마야|f.|환영, 환술|illusion|phil|
+मोक्ष|mokṣa|목샤|m.|해탈|liberation|phil|
+भक्ति|bhakti|박티|f.|헌신, 신애(信愛)|devotion|phil|
+ज्ञान|jñāna|즈냐나|n.|앎, 지혜|knowledge|phil|
+वेद|veda|베다|m.|지식; 베다 경전|knowledge; the Veda|phil|
+उपनिषद्|upaniṣad|우파니샤드|f.|우파니샤드, 비밀스러운 가르침|Upaniṣad, secret teaching|phil|
+गीता|gītā|기타|f.|노래|song|phil|『바가바드 기타』의 '기타'
+भगवत्|bhagavat|바가바트|adj./m.|복된; 세존(世尊), 존귀한 분|blessed; the Lord|phil|주격 단수 bhagavān(भगवान्)
+अवतार|avatāra|아바타라|m.|화신, 신의 하강|descent, incarnation|phil|
+प्रकृति|prakṛti|프라크리티|f.|자연, 근본 물질|nature, primal matter|phil|
+गुण|guṇa|구나|m.|성질, 속성; 줄|quality; strand|phil|삿트바·라자스·타마스 세 구나
+सत्त्व|sattva|삿트바|n.|존재; 순수성|being; purity|phil|
+रजस्|rajas|라자스|n.|격정, 활동성|passion, activity|phil|
+तमस्|tamas|타마스|n.|어둠, 둔함|darkness, inertia|phil|
+अहंकार|ahaṃkāra|아함카라|m.|아만(我慢), '나'라는 의식|ego, I-maker|phil|
+मनस्|manas|마나스|n.|마음, 의(意)|mind|phil|
+बुद्धि|buddhi|붓디|f.|지성, 판단력|intellect|phil|
+लीला|līlā|릴라|f.|유희, 신의 놀이|play|phil|
+यज्ञ|yajña|야즈냐|m.|제사, 희생제|sacrifice, ritual|phil|
+पूजा|pūjā|푸자|f.|예배, 공양|worship|phil|
+तीर्थ|tīrtha|티르타|n.|나루; 성지|ford; pilgrimage place|phil|
+ऋषि|ṛṣi|리시|m.|선인(仙人), 현자|seer, sage|phil|
+मुनि|muni|무니|m.|성자, 침묵 수행자|sage, ascetic|phil|석가모니 = Śākyamuni
+संन्यास|saṃnyāsa|산니야사|m.|출가, 버림|renunciation|phil|
+अद्वैत|advaita|아드바이타|n.|불이(不二), 둘 아님|non-duality|phil|
+ब्राह्मण|brāhmaṇa|브라마나|m.|바라문, 사제 계급|brahmin|phil|
+ब्रह्मा|brahmā|브라흐마|m.|창조의 신 브라흐마|Brahmā, the creator|god|
+विष्णु|viṣṇu|비슈누|m.|유지의 신 비슈누|Viṣṇu, the preserver|god|
+शिव|śiva|시바|m.|파괴와 재생의 신 시바; (형용사) 상서로운|Śiva; auspicious|god|
+गणेश|gaṇeśa|가네샤|m.|코끼리 머리의 신, 장애를 없애는 신|Gaṇeśa|god|gaṇa(무리) + īśa(주인). Ganesh, Ganapati
+इन्द्र|indra|인드라|m.|신들의 왕, 제석천(帝釋天)|Indra, king of gods|god|
+लक्ष्मी|lakṣmī|락슈미|f.|부와 행운의 여신|Lakṣmī, goddess of fortune|god|
+सरस्वती|sarasvatī|사라스바티|f.|학문과 예술의 여신, 변재천(辯才天)|Sarasvatī, goddess of learning|god|
+पार्वती|pārvatī|파르바티|f.|시바의 배우자, 산의 딸|Pārvatī|god|parvata(산)에서 나옴
+दुर्गा|durgā|두르가|f.|전사 여신|Durgā|god|
+काली|kālī|칼리|f.|시간과 파괴의 여신|Kālī|god|
+राम|rāma|라마|m.|『라마야나』의 영웅|Rāma|god|
+हनुमत्|hanumat|하누만|m.|원숭이 신|Hanumān|god|주격 단수 hanumān(हनुमान्)
+संस्कृत|saṃskṛta|삼스크리타|adj.|다듬어진, 완성된; 산스크리트어|refined; Sanskrit|lang|
+देवनागरी|devanāgarī|데바나가리|f.|데바나가리 문자|Devanāgarī script|lang|
+व्याकरण|vyākaraṇa|비야카라나|n.|문법(학)|grammar|lang|
+श्लोक|śloka|슐로카|m.|시구, 송(頌)|verse, stanza|lang|
+अक्षर|akṣara|악샤라|n.|음절, 글자; (형용사) 불멸의|syllable, letter; imperishable|lang|
+धातु|dhātu|다투|m.|동사 어근; 요소, 원소|verbal root; element|lang|
+काव्य|kāvya|카비야|n.|시, 문학 작품|poetry|lang|
+पुराण|purāṇa|푸라나|n.|옛이야기, 푸라나 문헌|ancient lore|lang|
+रामायण|rāmāyaṇa|라마야나|n.|『라마야나』, 라마의 여정|the Rāmāyaṇa|lang|
+महाभारत|mahābhārata|마하바라타|n.|『마하바라타』|the Mahābhārata|lang|
+सन्धि|sandhi|산디|m.|연성(連聲), 소리의 결합|euphonic combination|lang|
+विभक्ति|vibhakti|비박티|f.|격어미, 격|case ending|lang|
+वचन|vacana|바차나|n.|말; 문법상의 수(數)|word; grammatical number|lang|
+लिङ्ग|liṅga|링가|n.|표지; 문법상의 성(性)|mark; grammatical gender|lang|
+रस|rasa|라사|m.|즙, 맛; 예술적 정취|juice, taste; aesthetic mood|lang|
+गम्|gam|감|√|가다|go|root|गच्छति gacchati
+भू|bhū|부|√|되다, 있다|be, become|root|भवति bhavati
+अस्|as|아스|√|있다, ~이다|be, exist|root|अस्ति asti
+कृ|kṛ|크리|√|하다, 만들다|do, make|root|करोति karoti
+दा|dā|다|√|주다|give|root|ददाति dadāti
+स्था|sthā|스타|√|서다, 머물다|stand, stay|root|तिष्ठति tiṣṭhati
+दृश्|dṛś|드리시|√|보다|see|root|पश्यति paśyati
+श्रु|śru|슈루|√|듣다|hear|root|शृणोति śṛṇoti
+वद्|vad|바드|√|말하다|speak|root|वदति vadati
+पठ्|paṭh|파트|√|읽다, 암송하다|read, recite|root|पठति paṭhati
+लिख्|likh|리크|√|쓰다, 긋다|write, scratch|root|लिखति likhati
+ज्ञा|jñā|즈냐|√|알다|know|root|जानाति jānāti
+विद्|vid|비드|√|알다|know|root|वेत्ति vetti
+पा|pā|파|√|마시다|drink|root|पिबति pibati
+अद्|ad|아드|√|먹다|eat|root|अत्ति atti
+खाद्|khād|카드|√|씹다, 먹다|chew, eat|root|खादति khādati
+नी|nī|니|√|이끌다, 데려가다|lead|root|नयति nayati
+जि|ji|지|√|이기다|conquer, win|root|जयति jayati
+जीव्|jīv|지브|√|살다|live|root|जीवति jīvati
+मृ|mṛ|므리|√|죽다|die|root|म्रियते mriyate
+चर्|car|차르|√|다니다, 행하다|move, practise|root|चरति carati
+पत्|pat|파트|√|떨어지다, 날다|fall, fly|root|पतति patati
+वस्|vas|바스|√|살다, 머물다|dwell|root|वसति vasati
+इष्|iṣ|이시|√|원하다|wish, desire|root|इच्छति icchati
+लभ्|labh|라브|√|얻다|obtain|root|लभते labhate
+स्मृ|smṛ|스므리|√|기억하다|remember|root|स्मरति smarati
+चिन्त्|cint|친트|√|생각하다|think|root|चिन्तयति cintayati
+नम्|nam|남|√|절하다, 굽히다|bow|root|नमति namati
+युज्|yuj|유즈|√|묶다, 결합하다|yoke, join|root|युनक्ति yunakti
+बुध्|budh|부드|√|깨어나다, 알아차리다|wake, understand|root|बुध्यते budhyate
+मन्|man|만|√|생각하다, 여기다|think|root|मन्यते manyate
+हन्|han|한|√|죽이다, 치다|strike, kill|root|हन्ति hanti
+रक्ष्|rakṣ|락시|√|보호하다|protect|root|रक्षति rakṣati
+सेव्|sev|세브|√|섬기다|serve|root|सेवते sevate
+धृ|dhṛ|드리|√|지니다, 유지하다|hold, support|root|धारयति dhārayati (사역형)
+क्रीड्|krīḍ|크리드|√|놀다|play|root|क्रीडति krīḍati
+नृत्|nṛt|느리트|√|춤추다|dance|root|नृत्यति nṛtyati
+गै|gai|가이|√|노래하다|sing|root|गायति gāyati
+हस्|has|하스|√|웃다|laugh|root|हसति hasati
+पच्|pac|파치|√|요리하다, 익히다|cook|root|पचति pacati
+स्ना|snā|스나|√|목욕하다|bathe|root|स्नाति snāti
+स्वप्|svap|스바프|√|자다|sleep|root|स्वपिति svapiti
+प्रच्छ्|pracch|프라치|√|묻다|ask|root|पृच्छति pṛcchati
+क्रम्|kram|크람|√|걷다, 넘어가다|step|root|क्रामति krāmati
+आप्|āp|아프|√|얻다, 이르다|obtain, reach|root|आप्नोति āpnoti
+चतुरार्यसत्य|caturāryasatya|차투라리야사티야|n.|사성제(四聖諦), 네 가지 거룩한 진리|four noble truths|bud|고·집·멸·도
+समुदय|samudaya|사무다야|m.|집(集), 괴로움의 원인; 일어남|origin, arising|bud|
+निरोध|nirodha|니로다|m.|멸(滅), 소멸; 억제|cessation; restraint|bud|
+अष्टाङ्गमार्ग|aṣṭāṅgamārga|아슈탕가마르가|m.|팔정도(八正道)|noble eightfold path|bud|
+सम्यग्दृष्टि|samyagdṛṣṭi|삼약드리슈티|f.|정견(正見), 바른 견해|right view|bud|팔정도 1
+सम्यक्संकल्प|samyaksaṃkalpa|삼약상칼파|m.|정사유(正思惟), 바른 생각|right intention|bud|팔정도 2
+सम्यग्वाच्|samyagvāc|삼약바치|f.|정어(正語), 바른 말|right speech|bud|팔정도 3
+सम्यक्कर्मान्त|samyakkarmānta|삼약카르만타|m.|정업(正業), 바른 행위|right action|bud|팔정도 4
+सम्यगाजीव|samyagājīva|삼야가지바|m.|정명(正命), 바른 생계|right livelihood|bud|팔정도 5
+सम्यग्व्यायाम|samyagvyāyāma|삼약비야야마|m.|정정진(正精進), 바른 노력|right effort|bud|팔정도 6
+सम्यक्स्मृति|samyaksmṛti|삼약스므리티|f.|정념(正念), 바른 마음챙김|right mindfulness|bud|팔정도 7
+सम्यक्समाधि|samyaksamādhi|삼약사마디|m.|정정(正定), 바른 집중|right concentration|bud|팔정도 8
+मध्यमा प्रतिपद्|madhyamā pratipad|마디야마 프라티파드|f.|중도(中道)|the middle way|bud|
+त्रिरत्न|triratna|트리라트나|n.|삼보(三寶): 불·법·승|three jewels|bud|
+शरण|śaraṇa|샤라나|n.|귀의(歸依), 피난처|refuge|bud|
+दान|dāna|다나|n.|보시(布施), 베풂|giving, generosity|bud|육바라밀 1
+क्षान्ति|kṣānti|크샨티|f.|인욕(忍辱), 참음|patience|bud|육바라밀 3
+वीर्य|vīrya|비리야|n.|정진(精進), 힘|vigor, effort|bud|육바라밀 4. 아유르베다에서는 약의 열성·냉성
+स्मृति|smṛti|스므리티|f.|염(念), 마음챙김; 기억; 전승 문헌|mindfulness; memory; tradition|bud|
+सम्प्रजन्य|samprajanya|삼프라잔야|n.|정지(正知), 분명한 알아차림|clear comprehension|bud|
+शमथ|śamatha|샤마타|m.|지(止), 고요히 머묾|calm abiding|bud|
+विपश्यना|vipaśyanā|비파시야나|f.|관(觀), 통찰 명상|insight meditation|bud|팔리어 vipassanā
+आनापानस्मृति|ānāpānasmṛti|아나파나스므리티|f.|안반념(安般念), 호흡 관찰|mindfulness of breathing|bud|
+स्मृत्युपस्थान|smṛtyupasthāna|스므리티유파스타나|n.|염처(念處), 마음챙김의 확립|foundation of mindfulness|bud|사념처: 신·수·심·법
+ब्रह्मविहार|brahmavihāra|브라흐마비하라|m.|사무량심(四無量心), 거룩한 머묾|divine abodes|bud|자·비·희·사
+क्लेश|kleśa|클레샤|m.|번뇌(煩惱)|affliction, defilement|bud|
+राग|rāga|라가|m.|탐(貪), 애착; (음악) 라가 선율|passion, attachment; melody|bud|
+द्वेष|dveṣa|드베샤|m.|진(瞋), 미움|hatred, aversion|bud|
+मोह|moha|모하|m.|치(癡), 어리석음, 미혹|delusion|bud|탐·진·치 삼독(三毒)
+लोभ|lobha|로바|m.|탐욕|greed|bud|
+मान|māna|마나|m.|만(慢), 교만; 존중|pride; respect|bud|
+उपादान|upādāna|우파다나|n.|취(取), 집착; 연료|clinging; fuel|bud|십이연기 9
+भव|bhava|바바|m.|유(有), 존재, 됨|becoming, existence|bud|십이연기 10
+जाति|jāti|자티|f.|생(生), 태어남; 출신 집단|birth; caste|bud|십이연기 11
+जरामरण|jarāmaraṇa|자라마라나|n.|노사(老死), 늙음과 죽음|aging and death|bud|십이연기 12
+नामरूप|nāmarūpa|나마루파|n.|명색(名色), 정신과 물질|name and form|bud|십이연기 4
+षडायतन|ṣaḍāyatana|샤다야타나|n.|육입(六入), 여섯 감각 영역|six sense bases|bud|십이연기 5
+स्पर्श|sparśa|스파르샤|m.|촉(觸), 접촉|contact, touch|bud|십이연기 6
+आयतन|āyatana|아야타나|n.|처(處), 감각 영역; 거처|sense base; abode|bud|
+बोधिचित्त|bodhicitta|보디치타|n.|보리심(菩提心), 깨달음을 구하는 마음|mind of awakening|bud|
+अनुत्तरसम्यक्सम्बोधि|anuttarasamyaksambodhi|아눗타라삼약삼보디|f.|아뇩다라삼먁삼보리, 위없는 바른 깨달음|supreme perfect awakening|bud|
+सम्बुद्ध|sambuddha|삼붓다|m.|완전히 깨달은 이|fully awakened one|bud|
+प्रत्येकबुद्ध|pratyekabuddha|프라티예카붓다|m.|벽지불(辟支佛), 연각(緣覺)|solitary buddha|bud|
+श्रावक|śrāvaka|슈라바카|m.|성문(聲聞), 가르침을 듣는 제자|hearer, disciple|bud|
+महासत्त्व|mahāsattva|마하삿트바|m.|마하살(摩訶薩), 위대한 존재|great being|bud|
+आर्य|ārya|아리야|adj./m.|거룩한, 고귀한; 성자|noble; noble one|bud|
+सुगत|sugata|수가타|m.|선서(善逝), 잘 가신 분|well-gone one|bud|부처의 별칭
+जिन|jina|지나|m.|승리자(부처·자이나 성자의 칭호)|victor|bud|
+सर्वज्ञ|sarvajña|사르바즈냐|adj./m.|모든 것을 아는 (이), 일체지자|omniscient|bud|
+हीनयान|hīnayāna|히나야나|n.|소승(小乘)|lesser vehicle|bud|대승 쪽에서 붙인 이름
+वज्रयान|vajrayāna|바즈라야나|n.|금강승(金剛乘), 밀교|diamond vehicle|bud|
+स्थविरवाद|sthaviravāda|스타비라바다|m.|상좌부(上座部)|doctrine of the elders|bud|팔리어 Theravāda
+माध्यमक|mādhyamaka|마디야마카|m.|중관(中觀)학파|Middle Way school|bud|
+योगाचार|yogācāra|요가차라|m.|유가행파(瑜伽行派)|Yogācāra school|bud|
+विज्ञप्तिमात्र|vijñaptimātra|비즈냡티마트라|n.|유식(唯識), 오직 표상뿐|representation-only|bud|
+आलयविज्ञान|ālayavijñāna|알라야비즈냐나|n.|아뢰야식(阿賴耶識), 저장식|storehouse consciousness|bud|
+तथागतगर्भ|tathāgatagarbha|타타가타가르바|m.|여래장(如來藏)|womb of the Tathāgata|bud|
+बुद्धधातु|buddhadhātu|붓다다투|m.|불성(佛性)|buddha-nature|bud|
+त्रिकाय|trikāya|트리카야|m.|삼신(三身)|three bodies of a buddha|bud|
+धर्मकाय|dharmakāya|다르마카야|m.|법신(法身)|dharma body|bud|
+सम्भोगकाय|sambhogakāya|삼보가카야|m.|보신(報身)|enjoyment body|bud|
+निर्माणकाय|nirmāṇakāya|니르마나카야|m.|화신(化身)|emanation body|bud|
+संवृतिसत्य|saṃvṛtisatya|삼브리티사티야|n.|세속제(世俗諦)|conventional truth|bud|
+परमार्थसत्य|paramārthasatya|파라마르타사티야|n.|승의제(勝義諦), 궁극의 진리|ultimate truth|bud|
+स्वभाव|svabhāva|스바바바|m.|자성(自性), 본성|own-being, nature|bud|
+निःस्वभाव|niḥsvabhāva|니스바바바|adj.|무자성(無自性)|without own-being|bud|
+प्रपञ्च|prapañca|프라판차|m.|희론(戲論), 개념의 확산; 현상 세계|conceptual proliferation|bud|
+विकल्प|vikalpa|비칼파|m.|분별(分別); 선택지|conceptualization; option|bud|
+हेतु|hetu|헤투|m.|인(因), 원인; 근거|cause; reason|bud|
+प्रत्यय|pratyaya|프라티야야|m.|연(緣), 조건; 확신; (문법) 접미사|condition; conviction; suffix|bud|
+विपाक|vipāka|비파카|m.|과보(果報), 익음; (아유르베다) 소화 후의 맛|ripening, result|bud|
+कुशल|kuśala|쿠샬라|adj.|선(善)한, 능숙한; 건강한|wholesome, skillful|bud|
+अकुशल|akuśala|아쿠샬라|adj.|불선(不善)한|unwholesome|bud|
+अप्रमाद|apramāda|아프라마다|m.|불방일(不放逸), 깨어 있는 성실함|heedfulness|bud|
+ह्री|hrī|흐리|f.|참(慚), 부끄러워함|shame, modesty|bud|
+वितर्क|vitarka|비타르카|m.|심(尋), 거친 사유|initial thought|bud|
+विचार|vicāra|비차라|m.|사(伺), 미세한 사유; 숙고|sustained thought; reflection|bud|
+प्रीति|prīti|프리티|f.|희(喜), 기쁨, 환희|rapture, joy|bud|
+एकाग्रता|ekāgratā|에카그라타|f.|심일경성(心一境性), 한곳에 모음|one-pointedness|bud|
+संयोजन|saṃyojana|삼요자나|n.|결(結), 속박|fetter|bud|
+आस्रव|āsrava|아스라바|m.|누(漏), 번뇌의 흘러나옴|influx, outflow|bud|
+अनास्रव|anāsrava|아나스라바|adj.|무루(無漏)의|free from outflows|bud|
+निमित्त|nimitta|니미타|n.|상(相), 표상; 원인|sign, mark; cause|bud|
+अनिमित्त|animitta|아니미타|n.|무상(無相)|signlessness|bud|삼해탈문: 공·무상·무원
+अप्रणिहित|apraṇihita|아프라니히타|n.|무원(無願)|wishlessness|bud|
+क्षण|kṣaṇa|크샤나|m.|찰나(刹那), 순간|moment|bud|
+पुद्गल|pudgala|푸드갈라|m.|보특가라, 개인|person, individual|bud|
+अभिज्ञा|abhijñā|아비즈냐|f.|신통(神通), 뛰어난 앎|direct knowledge|bud|
+ऋद्धि|ṛddhi|리디|f.|신족(神足), 신통력; 번영|psychic power; prosperity|bud|
+परिणामना|pariṇāmanā|파리나마나|f.|회향(廻向)|dedication of merit|bud|
+स्रोतआपन्न|srotaāpanna|스로타아판나|m.|수다원(須陀洹), 예류(預流)|stream-enterer|bud|사과(四果) 1
+सकृदागामिन्|sakṛdāgāmin|사크리다가민|m.|사다함(斯陀含), 일래(一來)|once-returner|bud|사과 2
+अनागामिन्|anāgāmin|아나가민|m.|아나함(阿那含), 불환(不還)|non-returner|bud|사과 3
+भूमि|bhūmi|부미|f.|땅; 지(地), 수행 단계|earth; stage|bud|보살 십지(十地)
+कल्प|kalpa|칼파|m.|겁(劫), 아주 긴 시간; 규칙|eon; rule|bud|
+कल्याणमित्र|kalyāṇamitra|칼리야나미트라|n.|선지식(善知識), 좋은 벗|spiritual friend|bud|
+सद्धर्म|saddharma|삿다르마|m.|정법(正法), 참된 가르침|true dharma|bud|
+अभिधर्म|abhidharma|아비다르마|m.|아비달마, 논(論)|higher teaching|bud|
+विनय|vinaya|비나야|m.|율(律), 계율; 단련|monastic discipline|bud|
+त्रिपिटक|tripiṭaka|트리피타카|n.|삼장(三藏): 경·율·논|three baskets|bud|
+प्रातिमोक्ष|prātimokṣa|프라티모크샤|m.|바라제목차(波羅提木叉), 계본|monastic code|bud|
+उपोषध|upoṣadha|우포샤다|m.|포살(布薩), 재계일|observance day|bud|팔리어 uposatha
+गाथा|gāthā|가타|f.|게송(偈頌), 시구|verse|bud|
+धारणी|dhāraṇī|다라니|f.|다라니(陀羅尼), 총지(總持)|mnemonic incantation|bud|
+अभिषेक|abhiṣeka|아비셰카|m.|관정(灌頂), 즉위·입문의 물 뿌림|consecration|bud|
+स्वाहा|svāhā|스바하|ind.|사바하, 원만히 이루어지소서|hail, so be it|bud|진언 끝에 붙는 말
+बीज|bīja|비자|n.|씨앗, 종자; 종자 진언|seed; seed syllable|bud|
+उपासक|upāsaka|우파사카|m.|우바새(優婆塞), 남자 재가 신자|lay follower (male)|bud|
+उपासिका|upāsikā|우파시카|f.|우바이(優婆夷), 여자 재가 신자|lay follower (female)|bud|
+श्रमण|śramaṇa|슈라마나|m.|사문(沙門), 수행자|ascetic, renunciant|bud|
+श्रामणेर|śrāmaṇera|슈라마네라|m.|사미(沙彌)|novice monk|bud|
+उपाध्याय|upādhyāya|우파디야야|m.|화상(和尙), 은사, 스승|preceptor|bud|
+आचार्य|ācārya|아차리야|m.|아사리(阿闍梨), 스승|teacher, master|bud|
+चैत्य|caitya|차이티야|n.|탑묘, 성소|shrine|bud|
+सङ्घाराम|saṅghārāma|상가라마|m.|승가람(僧伽藍), 가람|monastery|bud|
+पात्र|pātra|파트라|n.|그릇; 발우(鉢盂)|vessel; alms bowl|bud|
+चीवर|cīvara|치바라|n.|가사, 승복|monk's robe|bud|
+काषाय|kāṣāya|카샤야|n.|가사(袈裟), 황갈색 옷|ochre robe|bud|
+धर्मचक्र|dharmacakra|다르마차크라|n.|법륜(法輪)|wheel of dharma|bud|
+धर्मचक्रप्रवर्तन|dharmacakrapravartana|다르마차크라프라바르타나|n.|전법륜(轉法輪), 법의 바퀴를 굴림|turning the wheel of dharma|bud|
+परिनिर्वाण|parinirvāṇa|파리니르바나|n.|반열반(般涅槃), 완전한 열반|final nirvāṇa|bud|
+मार|māra|마라|m.|마라, 마구니; 죽음|Māra, the tempter; death|bud|
+प्रेत|preta|프레타|m.|아귀(餓鬼); 죽은 이|hungry ghost; the departed|bud|
+असुर|asura|아수라|m.|아수라, 신들과 싸우는 존재|titan, demon|bud|
+नरक|naraka|나라카|m.|지옥|hell|bud|
+सुखावती|sukhāvatī|수카바티|f.|극락(極樂), 아미타불의 정토|Land of Bliss|bud|
+बुद्धक्षेत्र|buddhakṣetra|붓다크셰트라|n.|불국토(佛國土)|buddha-field|bud|
+शाक्यमुनि|śākyamuni|샤키야무니|m.|석가모니(釋迦牟尼), 샤키야족의 성자|sage of the Śākyas|bud|
+सिद्धार्थ|siddhārtha|싯다르타|m.|싯다르타, 뜻을 이룬 이|one who has achieved his aim|bud|석가모니의 출가 전 이름
+गौतम|gautama|가우타마|m.|고타마(구담), 석가모니의 성|Gautama|bud|
+मैत्रेय|maitreya|마이트레야|m.|미륵(彌勒)보살|Maitreya|bud|maitrī(자애)에서 나옴
+भैषज्यगुरु|bhaiṣajyaguru|바이샤지야구루|m.|약사여래(藥師如來)|Medicine Buddha|bud|
+वैरोचन|vairocana|바이로차나|m.|비로자나불(毘盧遮那佛)|Vairocana|bud|
+क्षितिगर्भ|kṣitigarbha|크시티가르바|m.|지장(地藏)보살|Kṣitigarbha|bud|
+समन्तभद्र|samantabhadra|사만타바드라|m.|보현(普賢)보살|Samantabhadra|bud|
+तारा|tārā|타라|f.|별; 타라 보살|star; Tārā|bud|
+नागार्जुन|nāgārjuna|나가르주나|m.|용수(龍樹), 중관학파의 시조|Nāgārjuna|bud|
+असङ्ग|asaṅga|아상가|m.|무착(無著), 유식학파의 논사|Asaṅga|bud|
+वसुबन्धु|vasubandhu|바수반두|m.|세친(世親), 유식학파의 논사|Vasubandhu|bud|
+राहुल|rāhula|라훌라|m.|라훌라(나후라), 석가모니의 아들|Rāhula|bud|
+लुम्बिनी|lumbinī|룸비니|f.|룸비니, 석가모니가 태어난 곳|Lumbinī|bud|
+बोधगया|bodhagayā|보드가야|f.|보드가야, 깨달음을 얻은 곳|Bodh Gaya|bud|
+मृगदाव|mṛgadāva|므리가다바|m.|녹야원(鹿野苑), 첫 설법지|Deer Park|bud|
+कुशिनगर|kuśinagara|쿠시나가라|n.|쿠시나가라, 열반한 곳|Kuśinagara|bud|
+सद्धर्मपुण्डरीक|saddharmapuṇḍarīka|삿다르마푼다리카|m.|『법화경(法華經)』, 묘법연화|Lotus Sūtra|bud|
+प्रज्ञापारमिताहृदय|prajñāpāramitāhṛdaya|프라즈냐파라미타흐리다야|n.|『반야심경(般若心經)』|Heart Sūtra|bud|
+वज्रच्छेदिका|vajracchedikā|바즈랏체디카|f.|『금강경(金剛經)』|Diamond Sūtra|bud|
+अवतंसक|avataṃsaka|아바탐사카|m.|화엄(華嚴), 꽃장식|garland|bud|『화엄경』의 이름
+लङ्कावतार|laṅkāvatāra|랑카바타라|m.|『능가경(楞伽經)』|Laṅkāvatāra Sūtra|bud|
+पुण्डरीक|puṇḍarīka|푼다리카|n.|흰 연꽃|white lotus|bud|
+उत्पल|utpala|우트팔라|n.|푸른 연꽃|blue lotus|bud|
+मणि|maṇi|마니|m.|보주(寶珠), 보석|jewel|bud|
+ॐ मणिपद्मे हूँ|oṃ maṇipadme hūṃ|옴 마니 파드메 훔|ind.|옴 마니 반메 훔, 관세음보살 육자진언|Om, jewel in the lotus, hūṃ|bud|
+गते गते पारगते पारसंगते बोधि स्वाहा|gate gate pāragate pārasaṃgate bodhi svāhā|가테 가테 파라가테 파라상가테 보디 스바하|ind.|아제아제 바라아제 바라승아제 모지 사바하|gone, gone, gone beyond, gone altogether beyond, awakening, hail|bud|『반야심경』의 진언
+तन्त्र|tantra|탄트라|n.|베틀; 체계; 탄트라 경전|loom; system; tantra|bud|
+आध्यात्मिक|ādhyātmika|아디야트미카|adj.|영적인, 내면의 자아에 관한|spiritual|spirit|
+अध्यात्म|adhyātma|아디야트마|n.|최고의 자아, 영성|the supreme self|spirit|
+साधना|sādhanā|사다나|f.|수행, 영적 실천|spiritual practice|spirit|
+साधक|sādhaka|사다카|m.|수행자|practitioner|spirit|
+सिद्धि|siddhi|싯디|f.|성취, 완성; 초자연적 힘|accomplishment; supernatural power|spirit|
+सिद्ध|siddha|싯다|adj./m.|이루어진; 성취자|accomplished; perfected one|spirit|
+दर्शन|darśana|다르샤나|n.|봄, 친견(親見); 철학 체계|seeing, audience; philosophical view|spirit|
+सत्सङ्ग|satsaṅga|삿상가|m.|진리를 따르는 이들의 모임|company of the truthful|spirit|
+सद्गुरु|sadguru|사드구루|m.|참스승|true teacher|spirit|
+दीक्षा|dīkṣā|딕샤|f.|입문, 입문식; 서원|initiation|spirit|
+प्रसाद|prasāda|프라사다|m.|은총; 마음의 맑음; 공양 후 나누는 음식|grace; clarity; sacred offering|spirit|
+कृपा|kṛpā|크리파|f.|은총, 자비|grace, mercy|spirit|
+आशीर्वाद|āśīrvāda|아쉬르바다|m.|축복|blessing|spirit|
+सेवा|sevā|세바|f.|봉사, 섬김|selfless service|spirit|
+श्रद्धा|śraddhā|슈랏다|f.|믿음, 신심(信心)|faith|spirit|
+आनन्द|ānanda|아난다|m.|환희, 지복(至福); (불교) 아난 존자|bliss; Ānanda|spirit|
+सच्चिदानन्द|saccidānanda|삿치다난다|n.|존재·의식·지복|being-consciousness-bliss|spirit|sat + cit + ānanda
+सत्|sat|사트|adj./n.|있는, 참된; 존재, 실재|being, true; reality|spirit|
+चित्|cit|치트|f.|순수 의식|pure consciousness|spirit|
+चैतन्य|caitanya|차이타냐|n.|의식, 깨어 있음|consciousness|spirit|
+परमात्मन्|paramātman|파라마트만|m.|최고 자아, 지고의 영|supreme self|spirit|주격 단수 paramātmā(परमात्मा)
+साक्षिन्|sākṣin|사크신|m.|주시자, 목격자|witness|spirit|주격 단수 sākṣī(साक्षी)
+जाग्रत्|jāgrat|자그라트|n.|깨어 있는 상태|waking state|spirit|의식의 네 상태 1
+स्वप्न|svapna|스바프나|m.|꿈, 꿈꾸는 상태|dream|spirit|의식의 네 상태 2
+सुषुप्ति|suṣupti|수슈프티|f.|깊은 잠|deep sleep|spirit|의식의 네 상태 3
+तुरीय|turīya|투리야|adj./n.|넷째; 초월 의식|the fourth state|spirit|의식의 네 상태 4
+जीवन्मुक्त|jīvanmukta|지반묵타|m.|살아서 해탈한 이|liberated while living|spirit|
+कैवल्य|kaivalya|카이발리야|n.|독존(獨存), 해탈|isolation, liberation|spirit|
+आत्मज्ञान|ātmajñāna|아트마즈냐나|n.|자기에 대한 앎, 깨달음|self-knowledge|spirit|
+आत्मविचार|ātmavicāra|아트마비차라|m.|자기 탐구 ("나는 누구인가")|self-inquiry|spirit|
+ब्रह्मज्ञान|brahmajñāna|브라흐마즈냐나|n.|브라흐만에 대한 앎|knowledge of Brahman|spirit|
+विवेक|viveka|비베카|m.|분별지, 참과 거짓을 가림|discernment|spirit|
+वैराग्य|vairāgya|바이라기야|n.|이욕(離欲), 집착 없음|dispassion|spirit|
+अभ्यास|abhyāsa|아비야사|m.|꾸준한 수련, 반복|practice|spirit|
+संकल्प|saṃkalpa|상칼파|m.|의도, 결심, 서원|intention, resolve|spirit|
+जप|japa|자파|m.|만트라 염송|repetition of a mantra|spirit|
+माला|mālā|말라|f.|화환; 염주|garland; rosary|spirit|
+कीर्तन|kīrtana|키르타나|n.|찬송, 신의 이름을 부름|devotional chanting|spirit|
+भजन|bhajana|바자나|n.|경배; 찬가|worship; devotional song|spirit|
+प्रार्थना|prārthanā|프라르타나|f.|기도, 간청|prayer|spirit|
+स्तोत्र|stotra|스토트라|n.|찬가|hymn of praise|spirit|
+मौन|mauna|마우나|n.|침묵|silence|spirit|
+अमृत|amṛta|아므리타|n.|감로(甘露), 불사의 음료; (형용사) 죽지 않는|nectar of immortality; immortal|spirit|
+यन्त्र|yantra|얀트라|n.|도구; 명상용 신성 도형|instrument; sacred diagram|spirit|
+दिव्य|divya|디비야|adj.|신성한, 천상의|divine|spirit|
+पवित्र|pavitra|파비트라|adj.|깨끗한, 성스러운|pure, holy|spirit|
+तेजस्|tejas|테자스|n.|광휘, 빛, 열|radiance, fire|spirit|
+ज्योतिस्|jyotis|지요티스|n.|빛|light|spirit|
+श्री|śrī|슈리|f.|영광, 길상; 존칭 '슈리'|radiance, fortune; honorific|spirit|
+नमस्ते|namaste|나마스테|ind.|당신께 경배합니다 (인사말)|I bow to you|spirit|namas + te
+ऋत|ṛta|리타|n.|우주의 질서, 진리|cosmic order|spirit|
+स्वधर्म|svadharma|스바다르마|m.|자기 본분|one's own duty|spirit|
+निष्काम कर्म|niṣkāma karma|니슈카마 카르마|n.|결과를 바라지 않는 행위|desireless action|spirit|『바가바드 기타』의 가르침
+पुरुषार्थ|puruṣārtha|푸루샤르타|m.|인생의 네 목적: 다르마·아르타·카마·목샤|aims of human life|spirit|
+अर्थ|artha|아르타|m.|의미; 목적; 재물|meaning; aim; wealth|spirit|
+काम|kāma|카마|m.|욕망, 사랑; 사랑의 신|desire, love|spirit|
+आश्रम|āśrama|아슈라마|m.|수행처, 아쉬람; 인생의 단계|hermitage; stage of life|spirit|
+गृहस्थ|gṛhastha|그리하스타|m.|가장, 재가자; 가주기|householder|spirit|
+वानप्रस्थ|vānaprastha|바나프라스타|m.|숲으로 물러난 이; 임서기|forest dweller|spirit|
+संन्यासिन्|saṃnyāsin|산니야신|m.|출가 수행자|renunciant|spirit|주격 단수 saṃnyāsī(संन्यासी)
+स्वामिन्|svāmin|스바민|m.|주인; 스와미(수행자 칭호)|master, lord|spirit|주격 단수 svāmī(स्वामी)
+योगिन्|yogin|요긴|m.|요가 수행자, 요기|yogi|spirit|주격 단수 yogī(योगी)
+महात्मन्|mahātman|마하트만|m.|위대한 영혼|great soul|spirit|주격 단수 mahātmā(महात्मा)
+अवधूत|avadhūta|아바두타|m.|세속을 떨쳐 버린 수행자|one who has shaken off the world|spirit|
+महावाक्य|mahāvākya|마하바키야|n.|위대한 문장(우파니샤드의 핵심 구절)|great saying|spirit|
+अहं ब्रह्मास्मि|ahaṃ brahmāsmi|아함 브라흐마스미|ind.|"나는 브라흐만이다"|I am Brahman|spirit|마하바키야
+तत् त्वम् असि|tat tvam asi|타트 트밤 아시|ind.|"그대가 바로 그것이다"|That thou art|spirit|마하바키야
+सोऽहम्|so'ham|소함|ind.|"나는 그이다"|I am He|spirit|숨을 들이쉬며 so, 내쉬며 ham
+नेति नेति|neti neti|네티 네티|ind.|"이것도 아니고, 이것도 아니다"|not this, not this|spirit|
+सत्यमेव जयते|satyam eva jayate|사티얌 에바 자야테|ind.|"진리만이 승리한다"|truth alone triumphs|spirit|
+असतो मा सद्गमय|asato mā sad gamaya|아사토 마 사드 가마야|ind.|"거짓에서 진리로 이끄소서"|lead me from the unreal to the real|spirit|
+लोकाः समस्ताः सुखिनो भवन्तु|lokāḥ samastāḥ sukhino bhavantu|로카하 사마스타하 수키노 바반투|ind.|"모든 세상이 행복하기를"|may all beings be happy|spirit|
+मूलाधार|mūlādhāra|물라다라|n.|뿌리 차크라(회음)|root chakra|yoga|차크라 1
+स्वाधिष्ठान|svādhiṣṭhāna|스바디슈타나|n.|천골 차크라(하복부)|sacral chakra|yoga|차크라 2
+मणिपूर|maṇipūra|마니푸라|n.|태양신경총 차크라(배꼽)|navel chakra|yoga|차크라 3
+अनाहत|anāhata|아나하타|n.|가슴 차크라; 치지 않고 울리는 소리|heart chakra; unstruck sound|yoga|차크라 4
+विशुद्ध|viśuddha|비슛다|n.|목 차크라; (형용사) 아주 맑은|throat chakra; pure|yoga|차크라 5
+आज्ञा|ājñā|아즈냐|f.|미간 차크라; 명령|brow chakra; command|yoga|차크라 6
+सहस्रार|sahasrāra|사하스라라|n.|정수리 차크라, 천 개의 꽃잎|crown chakra|yoga|차크라 7
+कर्मयोग|karmayoga|카르마요가|m.|행위의 요가|yoga of action|yoga|
+भक्तियोग|bhaktiyoga|박티요가|m.|헌신의 요가|yoga of devotion|yoga|
+ज्ञानयोग|jñānayoga|즈냐나요가|m.|앎의 요가|yoga of knowledge|yoga|
+राजयोग|rājayoga|라자요가|m.|왕의 요가, 명상 중심의 요가|royal yoga|yoga|
+अष्टाङ्गयोग|aṣṭāṅgayoga|아슈탕가요가|m.|여덟 단계의 요가|eight-limbed yoga|yoga|야마·니야마·아사나·프라나야마·프라티야하라·다라나·디야나·사마디
+ईश्वरप्रणिधान|īśvarapraṇidhāna|이슈바라프라니다나|n.|신에 대한 헌신|devotion to the Lord|yoga|니야마 5
+वात|vāta|바타|m.|바타 도샤(바람·공간); 바람|vāta humor; wind|ayur|
+पित्त|pitta|피타|n.|피타 도샤(불·물); 담즙|pitta humor; bile|ayur|
+कफ|kapha|카파|m.|카파 도샤(물·흙); 점액|kapha humor; phlegm|ayur|
+त्रिदोष|tridoṣa|트리도샤|m.|세 도샤: 바타·피타·카파|the three humors|ayur|
+विकृति|vikṛti|비크리티|f.|현재의 불균형 상태; 변형|imbalance; alteration|ayur|타고난 체질은 prakṛti
+पञ्चमहाभूत|pañcamahābhūta|판차마하부타|n.|오대(五大): 공·풍·화·수·지|five great elements|ayur|
+सप्तधातु|saptadhātu|삽타다투|m.|일곱 신체 조직|seven bodily tissues|ayur|라사·락타·맘사·메다스·아스티·맛잔·슈크라
+मांस|māṃsa|맘사|n.|살, 근육; 고기|flesh, muscle|ayur|
+मेदस्|medas|메다스|n.|지방|fat|ayur|
+अस्थि|asthi|아스티|n.|뼈|bone|ayur|
+मज्जन्|majjan|맛잔|m.|골수|marrow|ayur|주격 단수 majjā(मज्जा)
+शुक्र|śukra|슈크라|n.|생식 정수; (남성명사) 금성|reproductive essence; Venus|ayur|
+ओजस्|ojas|오자스|n.|생명 정수, 활력, 면역력|vital essence, vigor|ayur|
+मल|mala|말라|m.|노폐물; 때, 더러움|waste; impurity|ayur|
+जठराग्नि|jaṭharāgni|자타라그니|m.|소화의 불|digestive fire|ayur|
+आम|āma|아마|adj./m.|덜 익은; 소화되지 않은 노폐물|unripe; undigested residue|ayur|
+स्रोतस्|srotas|스로타스|n.|흐름; 몸 안의 통로|stream; bodily channel|ayur|
+मर्मन्|marman|마르만|n.|급소, 생명점|vital point|ayur|주격 단수 marma(मर्म)
+उदान|udāna|우다나|m.|위로 오르는 기(氣)|upward vital air|ayur|다섯 바유 중 하나
+समान|samāna|사마나|m.|소화를 돕는 기(氣); (형용사) 같은|digestive vital air; same|ayur|
+व्यान|vyāna|비야나|m.|온몸을 도는 기(氣)|pervading vital air|ayur|
+अपान|apāna|아파나|m.|아래로 내리는 기(氣)|downward vital air|ayur|
+पञ्चकर्म|pañcakarma|판차카르마|n.|다섯 가지 정화 요법|five purification therapies|ayur|
+वमन|vamana|바마나|n.|구토 요법|therapeutic emesis|ayur|판차카르마 1
+विरेचन|virecana|비레차나|n.|설사 요법|purgation|ayur|판차카르마 2
+बस्ति|basti|바스티|m.|관장 요법; 방광|enema; bladder|ayur|판차카르마 3
+नस्य|nasya|나시야|n.|코로 약을 넣는 요법|nasal therapy|ayur|판차카르마 4
+रक्तमोक्षण|raktamokṣaṇa|락타목샤나|n.|사혈 요법|bloodletting|ayur|판차카르마 5
+स्नेहन|snehana|스네하나|n.|기름 요법|oleation|ayur|
+स्वेदन|svedana|스베다나|n.|땀 내기 요법|sudation|ayur|
+अभ्यङ्ग|abhyaṅga|아비양가|m.|기름 마사지|oil massage|ayur|
+शिरोधारा|śirodhārā|시로다라|f.|이마에 기름을 흘려 붓는 요법|oil streaming on the forehead|ayur|
+रसायन|rasāyana|라사야나|n.|회춘·강장 요법|rejuvenation therapy|ayur|
+वाजीकरण|vājīkaraṇa|바지카라나|n.|정력 강화 요법|virilification|ayur|
+चिकित्सा|cikitsā|치키트사|f.|치료|treatment|ayur|
+वैद्य|vaidya|바이디야|m.|의사, 아유르베다 의사|physician|ayur|
+औषध|auṣadha|아우샤다|n.|약|medicine|ayur|
+ओषधि|oṣadhi|오샤디|f.|약초, 식물|medicinal herb|ayur|
+रोग|roga|로가|m.|병|disease|ayur|
+व्याधि|vyādhi|비야디|m.|질병|illness|ayur|
+आरोग्य|ārogya|아로기야|n.|건강, 병 없음|health|ayur|
+स्वस्थ|svastha|스바스타|adj.|건강한, 자기 안에 바로 선|healthy|ayur|
+निदान|nidāna|니다나|n.|원인; 진단; (불교) 인연(因緣)|cause; diagnosis|ayur|
+नाडीपरीक्षा|nāḍīparīkṣā|나디파리크샤|f.|맥진(脈診)|pulse diagnosis|ayur|
+दिनचर्या|dinacaryā|디나차리야|f.|하루 섭생, 일과|daily regimen|ayur|
+ऋतुचर्या|ṛtucaryā|리투차리야|f.|계절 섭생|seasonal regimen|ayur|
+ऋतु|ṛtu|리투|m.|계절; 정해진 때|season|ayur|
+आहार|āhāra|아하라|m.|음식, 식사|food, diet|ayur|
+पथ्य|pathya|파티야|adj.|몸에 맞는, 이로운 (음식)|wholesome (diet)|ayur|
+अपथ्य|apathya|아파티야|adj.|몸에 맞지 않는, 해로운|unwholesome|ayur|
+षड्रस|ṣaḍrasa|샤드라사|m.|여섯 가지 맛|six tastes|ayur|단·신·짠·매운·쓴·떫은맛
+मधुर|madhura|마두라|adj.|단맛의, 달콤한|sweet|ayur|
+अम्ल|amla|암라|adj.|신맛의|sour|ayur|
+लवण|lavaṇa|라바나|adj./n.|짠맛의; 소금|salty; salt|ayur|
+कटु|kaṭu|카투|adj.|매운맛의|pungent|ayur|
+तिक्त|tikta|티크타|adj.|쓴맛의|bitter|ayur|
+कषाय|kaṣāya|카샤야|adj.|떫은맛의|astringent|ayur|
+प्रभाव|prabhāva|프라바바|m.|특유의 효능, 위력|special potency, power|ayur|
+उष्ण|uṣṇa|우슈나|adj.|뜨거운, 열성의|hot|ayur|
+शीत|śīta|시타|adj.|차가운, 냉성의|cold|ayur|
+लघु|laghu|라구|adj.|가벼운; 짧은 (음절)|light; short|ayur|
+स्निग्ध|snigdha|스니그다|adj.|기름진, 윤기 있는|unctuous, oily|ayur|
+रूक्ष|rūkṣa|루크샤|adj.|건조한, 거친|dry, rough|ayur|
+घृत|ghṛta|그리타|n.|정제 버터, 기(ghee)|ghee|ayur|
+तैल|taila|타일라|n.|기름(특히 참기름)|oil|ayur|
+हरिद्रा|haridrā|하리드라|f.|강황|turmeric|ayur|
+त्रिफला|triphalā|트리팔라|f.|세 열매로 만든 약|three-fruit remedy|ayur|아말라키·하리타키·비비타키
+आमलकी|āmalakī|아말라키|f.|암라 열매(인도 구스베리)|Indian gooseberry|ayur|
+हरीतकी|harītakī|하리타키|f.|가자(訶子)|chebulic myrobalan|ayur|
+बिभीतकी|bibhītakī|비비타키|f.|비비타키 열매|belleric myrobalan|ayur|
+अश्वगन्धा|aśvagandhā|아슈바간다|f.|아슈와간다(약초)|winter cherry|ayur|'말 냄새'라는 뜻
+तुलसी|tulasī|툴라시|f.|툴시, 홀리 바질|holy basil|ayur|
+निम्ब|nimba|님바|m.|님나무|neem tree|ayur|
+शुण्ठी|śuṇṭhī|순티|f.|말린 생강|dry ginger|ayur|
+गुडूची|guḍūcī|구두치|f.|구두치(약용 덩굴)|Tinospora|ayur|
+ब्राह्मी|brāhmī|브라흐미|f.|브라미(약초); 브라흐미 문자|Bacopa; Brāhmī script|ayur|
+चन्दन|candana|찬다나|m./n.|백단(白檀)|sandalwood|ayur|
+कर्पूर|karpūra|카르푸라|m.|장뇌|camphor|ayur|
+धन्वन्तरि|dhanvantari|단반타리|m.|의술의 신 단반타리|god of medicine|ayur|
+चरकसंहिता|carakasaṃhitā|차라카삼히타|f.|『차라카 상히타』(내과 고전)|Caraka's Compendium|ayur|
+सुश्रुतसंहिता|suśrutasaṃhitā|수슈루타삼히타|f.|『수슈루타 상히타』(외과 고전)|Suśruta's Compendium|ayur|
+अष्टाङ्गहृदय|aṣṭāṅgahṛdaya|아슈탕가흐리다야|n.|『아슈탕가 흐리다야』|Heart of the Eight Limbs|ayur|
+स्कन्द|skanda|스칸다|m.|전쟁의 신 스칸다(무루간), 시바의 아들|Skanda, god of war|god|타밀어 Murugan(முருகன்)·Kartikeya·Subramanya와 같은 신. 위태천(韋駄天)으로도 전해짐
+कार्त्तिकेय|kārttikeya|카르티케야|m.|카르티케야, 크리티카(묘성) 여신들이 기른 신|Kārttikeya|god|스칸다의 다른 이름. 타밀어 Murugan
+सुब्रह्मण्य|subrahmaṇya|수브라마니야|m.|수브라마니야, 남인도에서 부르는 스칸다의 이름|Subrahmaṇya|god|타밀어 Murugan, Subramanian
+षण्मुख|ṣaṇmukha|샨무카|m.|여섯 얼굴을 가진 이(스칸다)|six-faced one|god|ṣaṣ(6) + mukha(얼굴). 타밀어 Arumugam
+कुमार|kumāra|쿠마라|m.|소년, 왕자; 스칸다의 별칭|youth, prince; Skanda|god|
+गणपति|gaṇapati|가나파티|m.|무리의 주인, 가네샤|lord of the hosts, Gaṇeśa|god|Ganesh, Ganapati
+विनायक|vināyaka|비나야카|m.|장애를 없애는 이, 가네샤|remover of obstacles, Gaṇeśa|god|
+रुद्र|rudra|루드라|m.|폭풍의 신 루드라, 시바의 옛 이름|Rudra|god|
+महादेव|mahādeva|마하데바|m.|위대한 신, 시바|the great god, Śiva|god|
+नटराज|naṭarāja|나타라자|m.|춤의 왕, 춤추는 시바|lord of dance|god|
+भैरव|bhairava|바이라바|m.|무서운 모습의 시바; (형용사) 무시무시한|Bhairava; terrible|god|
+अर्धनारीश्वर|ardhanārīśvara|아르다나리슈바라|m.|반은 여성인 신(시바와 파르바티의 합일)|half-woman lord|god|
+नन्दिन्|nandin|난딘|m.|시바가 타는 황소 난디|Nandi, Śiva's bull|god|주격 단수 nandī(नन्दी)
+उमा|umā|우마|f.|우마, 파르바티의 다른 이름|Umā|god|
+गौरी|gaurī|가우리|f.|흰 여신, 파르바티|the fair one, Pārvatī|god|
+शक्ति|śakti|샥티|f.|힘, 에너지; 여신의 창조력|power; divine feminine energy|god|
+अन्नपूर्णा|annapūrṇā|안나푸르나|f.|음식을 가득 채워 주는 여신|goddess of nourishment|god|
+गङ्गा|gaṅgā|강가|f.|갠지스강; 강의 여신|the Ganges|god|
+नारायण|nārāyaṇa|나라야나|m.|나라야나, 비슈누|Nārāyaṇa, Viṣṇu|god|
+हरि|hari|하리|m.|하리, 비슈누·크리슈나; (형용사) 황록색의|Hari, Viṣṇu|god|
+वासुदेव|vāsudeva|바수데바|m.|바수데바의 아들, 크리슈나|Kṛṣṇa|god|
+गोविन्द|govinda|고빈다|m.|소를 돌보는 이, 크리슈나|cowherd, Kṛṣṇa|god|
+गोपाल|gopāla|고팔라|m.|목동, 크리슈나|cowherd, Kṛṣṇa|god|
+राधा|rādhā|라다|f.|크리슈나의 연인 라다|Rādhā|god|
+सीता|sītā|시타|f.|라마의 아내 시타; 밭고랑|Sītā; furrow|god|
+लक्ष्मण|lakṣmaṇa|락슈마나|m.|라마의 동생 락슈마나|Lakṣmaṇa|god|
+रावण|rāvaṇa|라바나|m.|랑카의 마왕 라바나|Rāvaṇa|god|
+जगन्नाथ|jagannātha|자간나타|m.|세상의 주인, 크리슈나(푸리의 신)|lord of the world|god|Jagannath
+वेङ्कटेश्वर|veṅkaṭeśvara|벤카테슈바라|m.|벤카타산의 주인(티루파티의 비슈누)|lord of Veṅkaṭa hill|god|Venkateswara, Balaji
+नरसिंह|narasiṃha|나라싱하|m.|사람사자, 비슈누의 넷째 화신|man-lion avatar|god|
+वामन|vāmana|바마나|m.|난쟁이, 비슈누의 다섯째 화신|dwarf avatar|god|
+परशुराम|paraśurāma|파라슈라마|m.|도끼를 든 라마, 비슈누의 여섯째 화신|Rāma with the axe|god|
+कूर्म|kūrma|쿠르마|m.|거북; 비슈누의 둘째 화신|tortoise; tortoise avatar|god|
+वराह|varāha|바라하|m.|멧돼지; 비슈누의 셋째 화신|boar; boar avatar|god|
+कल्कि|kalki|칼키|m.|칼키, 앞으로 올 비슈누의 열째 화신|Kalki, the future avatar|god|
+दशावतार|daśāvatāra|다샤바타라|m.|비슈누의 열 화신|ten avatars of Viṣṇu|god|물고기·거북·멧돼지·사람사자·난쟁이·파라슈라마·라마·크리슈나·붓다(또는 발라라마)·칼키
+गरुड|garuḍa|가루다|m.|비슈누가 타는 신조(神鳥), 금시조|Garuḍa, divine eagle|god|
+शेष|śeṣa|셰샤|m.|비슈누가 눕는 천 개의 머리 뱀; 나머지|serpent Śeṣa; remainder|god|아난타(ananta)라고도 함
+नाग|nāga|나가|m.|뱀, 용(龍); 코끼리|serpent, dragon|god|
+दत्तात्रेय|dattātreya|닷타트레야|m.|브라흐마·비슈누·시바가 하나된 신|Dattātreya|god|
+अय्यप्पन्|ayyappan|아이얍판|m.|아이얍판(케랄라의 신)|Ayyappan|god|말라얄람어 이름. 산스크리트로는 Śāstā(शास्ता)
+वरुण|varuṇa|바루나|m.|물과 우주 질서의 신|god of waters and cosmic order|god|
+सोम|soma|소마|m.|소마(제사 음료, 그 신); 달|soma; moon|god|
+उषस्|uṣas|우샤스|f.|새벽의 여신|dawn|god|
+प्रजापति|prajāpati|프라자파티|m.|피조물의 주인, 창조신|lord of creatures|god|
+विश्वकर्मन्|viśvakarman|비슈바카르만|m.|만물을 만든 신, 신들의 장인|all-maker, divine architect|god|주격 단수 viśvakarmā(विश्वकर्मा)
+कुबेर|kubera|쿠베라|m.|재물의 신|god of wealth|god|불교의 비사문천과 연결됨
+कामदेव|kāmadeva|카마데바|m.|사랑의 신|god of love|god|
+अश्विन्|aśvin|아슈빈|m.|쌍둥이 의술의 신(아슈빈)|the Aśvins, twin healers|god|주로 쌍수 aśvinau
+अप्सरस्|apsaras|압사라스|f.|천상의 무희, 비천(飛天)|celestial nymph|god|
+गन्धर्व|gandharva|간다르바|m.|천상의 악사, 건달바(乾闥婆)|celestial musician|god|
+यक्ष|yakṣa|약샤|m.|야차(夜叉), 숲의 정령|nature spirit|god|
+`;
+
+const CATS = [
+  ["all", "전체"], ["basic", "기초 어휘"], ["num", "숫자"], ["bud", "불교"], ["yoga", "요가"], ["spirit", "영성"], ["ayur", "아유르베다"],
+  ["phil", "철학·종교"], ["god", "신과 신화"], ["lang", "언어·문학"], ["root", "동사 어근"],
+  ["d-a", "Apte"], ["d-m", "Monier-Williams"], ["d-b", "Edgerton 불교"]
+];
+const CAT_NAME = Object.fromEntries(CATS);
+const POS = {
+  "m.": "남성명사", "f.": "여성명사", "n.": "중성명사", "m./n.": "남성·중성명사", "n./m.": "중성·남성명사",
+  "m./f.": "남성·여성명사", "adj.": "형용사", "adj./m.": "형용사·남성명사", "pron.": "대명사",
+  "ind.": "불변화사", "num.": "수사", "√": "동사 어근"
+};
+const PAGE_LIMIT = 150;
+
+// 산스크리트 자모 순서
+const ORDER = ["a","ā","i","ī","u","ū","ṛ","ṝ","ḷ","e","ai","o","au","ṃ","ḥ","k","kh","g","gh","ṅ","c","ch","j","jh","ñ","ṭ","ṭh","ḍ","ḍh","ṇ","t","th","d","dh","n","p","ph","b","bh","m","y","r","l","v","ś","ṣ","s","h"];
+const RANK = Object.fromEntries(ORDER.map((t, n) => [t, n]));
+const DEVA_LETTER = {a:"अ",ā:"आ",i:"इ",ī:"ई",u:"उ",ū:"ऊ",ṛ:"ऋ",e:"ए",ai:"ऐ",o:"ओ",au:"औ",k:"क",kh:"ख",g:"ग",gh:"घ",ṅ:"ङ",c:"च",ch:"छ",j:"ज",jh:"झ",ñ:"ञ",ṭ:"ट",ṭh:"ठ",ḍ:"ड",ḍh:"ढ",ṇ:"ण",t:"त",th:"थ",d:"द",dh:"ध",n:"न",p:"प",ph:"फ",b:"ब",bh:"भ",m:"म",y:"य",r:"र",l:"ल",v:"व",ś:"श",ṣ:"ष",s:"स",h:"ह"};
+const VOWELS = ["a","ā","i","ī","u","ū","ṛ","e","ai","o","au"];
+
+function tokens(iast) {
+  const s = iast.normalize("NFC").toLowerCase().replace(/[^a-zāīūṛṝḷḹṃḥṅñṭḍṇśṣ]/g, "");
+  const out = [];
+  for (let i = 0; i < s.length;) {
+    const two = s.slice(i, i + 2);
+    if (two.length === 2 && RANK[two] !== undefined) { out.push(two); i += 2; }
+    else { out.push(s[i]); i += 1; }
+  }
+  return out;
+}
+function compareTokens(a, b) {
+  for (let i = 0; i < Math.min(a.length, b.length); i++) {
+    const d = (RANK[a[i]] ?? 99) - (RANK[b[i]] ?? 99);
+    if (d) return d;
+  }
+  return a.length - b.length;
+}
+// 발음 구별 기호 제거: ā→a, ś→s, ṛ→r …
+const plain = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z]/g, "");
+// 흔한 영어식 표기 허용: shanti, krishna, chakra
+const loose = s => s.normalize("NFC").toLowerCase()
+  .replace(/[śṣ]/g, "sh").replace(/ṛ/g, "ri").replace(/c(?!h)/g, "ch")
+  .normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z]/g, "");
+const keyOf = s => plain(s).replace(/sh/g, "s");
+
+// SLP1(Apte 원문 표기) → IAST, 데바나가리
+const SLP_IAST = {a:"a",A:"ā",i:"i",I:"ī",u:"u",U:"ū",f:"ṛ",F:"ṝ",x:"ḷ",X:"ḹ",e:"e",E:"ai",o:"o",O:"au",M:"ṃ",H:"ḥ","~":"m̐","'":"’",k:"k",K:"kh",g:"g",G:"gh",N:"ṅ",c:"c",C:"ch",j:"j",J:"jh",Y:"ñ",w:"ṭ",W:"ṭh",q:"ḍ",Q:"ḍh",R:"ṇ",t:"t",T:"th",d:"d",D:"dh",n:"n",p:"p",P:"ph",b:"b",B:"bh",m:"m",y:"y",r:"r",l:"l",v:"v",S:"ś",z:"ṣ",s:"s",h:"h",L:"ḻ"};
+// Apte는 자음 앞 비음을 아누스바라로 적음(SAMtiH) → 같은 계열 비음으로(SAntiH = śāntiḥ)
+const NASAL_BEFORE = { k:"N",K:"N",g:"N",G:"N", c:"Y",C:"Y",j:"Y",J:"Y", w:"R",W:"R",q:"R",Q:"R", t:"n",T:"n",d:"n",D:"n", p:"m",P:"m",b:"m",B:"m" };
+const fixNasals = s => s.replace(/M(?=([kKgGcCjJwWqQtTdDpPbB]))/g, (_, c) => NASAL_BEFORE[c]);
+const slpToIast = s => [...s].map(c => SLP_IAST[c] ?? c).join("");
+const DV_VOWEL = {a:"अ",A:"आ",i:"इ",I:"ई",u:"उ",U:"ऊ",f:"ऋ",F:"ॠ",x:"ऌ",X:"ॡ",e:"ए",E:"ऐ",o:"ओ",O:"औ"};
+const DV_SIGN = {a:"",A:"ा",i:"ि",I:"ी",u:"ु",U:"ू",f:"ृ",F:"ॄ",x:"ॢ",X:"ॣ",e:"े",E:"ै",o:"ो",O:"ौ"};
+const DV_CONS = {k:"क",K:"ख",g:"ग",G:"घ",N:"ङ",c:"च",C:"छ",j:"ज",J:"झ",Y:"ञ",w:"ट",W:"ठ",q:"ड",Q:"ढ",R:"ण",t:"त",T:"थ",d:"द",D:"ध",n:"न",p:"प",P:"फ",b:"ब",B:"भ",m:"म",y:"य",r:"र",l:"ल",v:"व",S:"श",z:"ष",s:"स",h:"ह",L:"ळ"};
+const DV_OTHER = {M:"ं",H:"ः","~":"ँ","'":"ऽ"};
+function slpToDeva(s) {
+  let out = "";
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (DV_CONS[c]) {
+      out += DV_CONS[c];
+      const n = s[i + 1];
+      if (n !== undefined && DV_SIGN[n] !== undefined) { out += DV_SIGN[n]; i++; }
+      else out += "्";
+    } else if (DV_VOWEL[c]) out += DV_VOWEL[c];
+    else out += DV_OTHER[c] ?? c;
+  }
+  return out;
+}
+
+// IAST → 한글 음역 (규칙 기반, 참고용)
+// 초성 번호: ㄱ0 ㄴ2 ㄷ3 ㄹ5 ㅁ6 ㅂ7 ㅅ9 ㅇ11 ㅈ12 ㅊ14 ㅋ15 ㅌ16 ㅍ17 ㅎ18
+const HG_ONSET = {k:15,kh:15,g:0,gh:0,ṅ:11,c:14,ch:14,j:12,jh:12,ñ:2,ṭ:16,ṭh:16,ḍ:3,ḍh:3,ṇ:2,t:16,th:16,d:3,dh:3,n:2,p:17,ph:17,b:7,bh:7,m:6,ṃ:6,y:11,r:5,l:5,ḻ:5,v:7,ś:9,ṣ:9,s:9,h:18};
+// 중성: ㅏ0 ㅑ2 ㅔ5 ㅖ7 ㅗ8 ㅛ12 ㅜ13 ㅠ17 ㅡ18 ㅣ20
+const HG_VOWEL = {a:0,ā:0,i:20,ī:20,u:13,ū:13,e:5,o:8,ai:0,au:0};
+const HG_GLIDE = {0:2,13:17,8:12,5:7,20:20};
+const STOP = {k:"g",kh:"g",g:"g",gh:"g",c:"d",ch:"d",j:"d",jh:"d",ṭ:"d",ṭh:"d",ḍ:"d",ḍh:"d",t:"d",th:"d",d:"d",dh:"d",p:"b",ph:"b",b:"b",bh:"b"};
+const STOP_JONG = {g:1, d:19, b:17};  // 받침 ㄱ ㅅ ㅂ
+const HG_V_TOKENS = new Set(["a","ā","i","ī","u","ū","ṛ","ṝ","ḷ","ḹ","e","ai","o","au"]);
+const VELAR = new Set(["k","kh","g","gh"]), DENTALISH = new Set(["c","ch","j","jh","ṭ","ṭh","ḍ","ḍh","t","th","d","dh","n","ṇ","ñ"]);
+const syl = (cho, jung, jong) => String.fromCharCode(0xAC00 + (cho * 21 + jung) * 28 + jong);
+
+function hangulJong(c, next) {
+  if (c === "ṃ") return next === undefined ? 16 : VELAR.has(next) ? 21 : DENTALISH.has(next) ? 4 : 16;
+  if (c === "m") return 16;
+  if (c === "n" || c === "ṇ" || c === "ñ") return 4;
+  if (c === "ṅ") return 21;
+  if (c === "l") return 8;
+  if (next !== undefined && STOP[c] && (STOP[next] || (c === "k" && next === "ṣ"))) return STOP_JONG[STOP[c]];
+  return 0;
+}
+function toHangul(iast) {
+  const out = [];
+  let cluster = [];
+  const flush = final => {
+    const upto = final ? cluster.length : cluster.length - 1;
+    for (let n = 0; n < upto; n++) {
+      const c = cluster[n], next = cluster[n + 1], prev = out[out.length - 1];
+      const jong = hangulJong(c, next);
+      if (jong && prev && !prev[2]) { prev[2] = jong; continue; }
+      let jung = 18;                                   // ㅡ: 드, 르, 스 …
+      if (next === "y" || c === "c" || c === "ch" || c === "y") jung = 20;   // 티야, 치
+      if (c === "ś" || c === "ṣ") jung = 17;           // 슈
+      out.push([HG_ONSET[c] ?? 11, jung, 0]);
+    }
+    const onset = final ? null : (cluster[cluster.length - 1] ?? null);
+    cluster = [];
+    return onset;
+  };
+  for (const tk of tokens(iast)) {
+    if (tk === "ḥ") continue;
+    if (!HG_V_TOKENS.has(tk)) { cluster.push(tk); continue; }
+    const onset = flush(false);
+    if (tk === "ṛ" || tk === "ṝ" || tk === "ḷ" || tk === "ḹ") {
+      if (onset) out.push([HG_ONSET[onset] ?? 11, 18, 0]);
+      out.push([5, 20, 0]);                            // 리
+      continue;
+    }
+    let jung = HG_VOWEL[tk];
+    if (onset === "y" || onset === "ñ" || onset === "ś" || onset === "ṣ") jung = HG_GLIDE[jung] ?? jung;
+    out.push([onset ? (HG_ONSET[onset] ?? 11) : 11, jung, 0]);
+    if (tk === "ai") out.push([11, 20, 0]);
+    if (tk === "au") out.push([11, 13, 0]);
+  }
+  flush(true);
+  return out.map(s => syl(...s)).join("");
+}
+
+// ── 발음: IPA, 음절(장단), 음성 ──
+const IPA = {a:"ɐ",ā:"aː",i:"i",ī:"iː",u:"u",ū:"uː",ṛ:"r̩",ṝ:"r̩ː",ḷ:"l̩",ḹ:"l̩ː",e:"eː",ai:"ɐi",o:"oː",au:"ɐu",
+  k:"k",kh:"kʰ",g:"g",gh:"gʱ",ṅ:"ŋ",c:"t͡ɕ",ch:"t͡ɕʰ",j:"d͡ʑ",jh:"d͡ʑʱ",ñ:"ɲ",ṭ:"ʈ",ṭh:"ʈʰ",ḍ:"ɖ",ḍh:"ɖʱ",ṇ:"ɳ",
+  t:"t̪",th:"t̪ʰ",d:"d̪",dh:"d̪ʱ",n:"n",p:"p",ph:"pʰ",b:"b",bh:"bʱ",m:"m",y:"j",r:"ɾ",l:"l",ḻ:"ɭ",v:"ʋ",ś:"ɕ",ṣ:"ʂ",s:"s",h:"ɦ",ṃ:"ⁿ",ḥ:"h"};
+const LONG_V = new Set(["ā","ī","ū","ṝ","ḹ","e","ai","o","au"]);
+function syllables(iast) {
+  const t = tokens(iast), out = [];
+  let onset = [];
+  for (const tk of t) {
+    if (!HG_V_TOKENS.has(tk)) { onset.push(tk); continue; }
+    // 모음 사이 자음이 둘 이상이면 첫 자음은 앞 음절 끝으로(VC.CV); ṃ ḥ는 늘 앞 음절 끝
+    if (out.length && (onset.length >= 2 || onset[0] === "ṃ" || onset[0] === "ḥ")) out[out.length - 1].coda.push(onset.shift());
+    out.push({ onset, v: tk, coda: [] });
+    onset = [];
+  }
+  if (out.length) out[out.length - 1].coda.push(...onset);
+  return out.map(s => {
+    const parts = [...s.onset, s.v, ...s.coda];
+    // 비사르가는 앞 모음을 짧게 메아리처럼: aḥ → [ɐhɐ]
+    const echo = { a: "ɐ", ā: "ɐ", i: "i", ī: "i", u: "u", ū: "u", e: "e", ai: "i", o: "o", au: "u" }[s.v] || "";
+    const ipa = parts.map(x => x === "ḥ" ? "h" + echo : IPA[x] ?? x).join("");
+    return { iast: parts.join(""), ipa, heavy: LONG_V.has(s.v) || s.coda.length > 0 };
+  });
+}
+const PRON_TIPS = [
+  [/[āīūṝ]/, "ā ī ū 같은 긴 모음은 두 배 길게"],
+  [/kh|gh|ch|jh|ṭh|ḍh|th|dh|ph|bh/, "h가 붙은 자음(kh, dh, bh …)은 숨을 세게 내뱉으며"],
+  [/[ṭḍṇṣ]/, "점 찍힌 ṭ ḍ ṇ ṣ는 혀끝을 입천장 쪽으로 말아 올려서"],
+  [/ṛ/, "ṛ은 모음으로, '르'와 '리' 사이를 짧게"],
+  [/ś/, "ś는 '시'에 가까운 부드러운 ㅅ"],
+  [/ṃ/, "ṃ은 앞 모음을 콧소리로 끝내는 소리"],
+  [/ḥ/, "끝의 ḥ는 앞 모음을 숨소리로 살짝 되풀이(aḥ → 아하)"],
+  [/[eo]/, "e와 o는 언제나 긴 모음"],
+];
+function pronBlock(en) {
+  const syl = syllables(en.i);
+  if (!syl.length) return "";
+  const tips = PRON_TIPS.filter(([re]) => re.test(en.i)).map(([, t]) => t);
+  return `<div class="pron">
+    <div class="pron-row">
+      <span class="pron-label">발음</span>
+      <span class="ipa">[${esc(syl.map(s => s.ipa).join("."))}]</span>
+      <button type="button" class="btn speak" data-speak="${en.d}"${speechReady ? "" : " hidden"}>
+        <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M3 7.5h3l4-3.5v12l-4-3.5H3z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M13 7a4 4 0 0 1 0 6M15.5 4.8a7 7 0 0 1 0 10.4"/></svg>
+        듣기</button>
+    </div>
+    <div class="syl" aria-label="음절과 장단">${syl.map(s =>
+      `<span class="s ${s.heavy ? "g" : "l"}" title="${s.heavy ? "긴 음절(guru)" : "짧은 음절(laghu)"}"><span class="m">${s.heavy ? "–" : "⏑"}</span><span class="t">${esc(s.iast)}</span></span>`).join("")}</div>
+    ${tips.length ? `<p class="pron-tip">${esc(tips.join(" · "))}</p>` : ""}
+  </div>`;
+}
+
+// 음성: 기기에 있는 산스크리트·힌디어 음성을 씀(없으면 듣기 버튼을 숨김)
+let speechReady = false, speechVoice = null;
+function pickVoice() {
+  try {
+    const vs = speechSynthesis.getVoices();
+    speechVoice = ["sa", "hi", "mr", "ne"].map(l => vs.find(v => v.lang.toLowerCase().startsWith(l))).find(Boolean) || null;
+  } catch { speechVoice = null; }
+  speechReady = !!speechVoice;
+  document.querySelectorAll("[data-speak]").forEach(b => { b.hidden = !speechReady; });
+}
+if ("speechSynthesis" in window) {
+  pickVoice();
+  try { speechSynthesis.addEventListener("voiceschanged", pickVoice); } catch {}
+}
+function speak(text) {
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.voice = speechVoice; u.lang = speechVoice?.lang || "hi-IN"; u.rate = 0.7;
+    speechSynthesis.speak(u);
+  } catch {}
+}
+
+// ── 쓰는 순서: 데바나가리를 음절 글자(akṣara) 단위로 나누고, 글자마다 쓰는 차례를 보여 줌 ──
+const DV_CONS_IAST = Object.fromEntries(Object.entries(DEVA_LETTER).filter(([k]) => !VOWELS.includes(k)).map(([k, v]) => [v, k]));
+DV_CONS_IAST["ळ"] = "ḻ";
+const DV_IND = Object.fromEntries(Object.entries(DEVA_LETTER).filter(([k]) => VOWELS.includes(k)).map(([k, v]) => [v, k]));
+Object.assign(DV_IND, { "ॠ": "ṝ", "ऌ": "ḷ" });
+const DV_VSIGN = {"ा":"ā","ि":"i","ी":"ī","ु":"u","ू":"ū","ृ":"ṛ","ॄ":"ṝ","ॢ":"ḷ","े":"e","ै":"ai","ो":"o","ौ":"au"};
+const DV_MOD = {
+  "ं": "아누스바라(ṃ) 점 — 맨 마지막에 위에 찍음",
+  "ः": "비사르가(ḥ) 두 점 — 맨 마지막에 오른쪽에 찍음",
+  "ँ": "찬드라빈두(m̐) — 위에 반달과 점",
+  "ऽ": "아바그라하 — 생략된 a 표시",
+};
+const LIGATURE = {"क्ष":"kṣ","ज्ञ":"jñ","त्र":"tr","श्र":"śr","द्ध":"ddh","द्व":"dv","द्य":"dy","ह्म":"hm","ह्य":"hy","द्म":"dm","ट्ट":"ṭṭ","ङ्ग":"ṅg"};
+const VIRAMA = "्";
+function akshara(word) {
+  const out = [], s = [...word];
+  for (let i = 0; i < s.length;) {
+    const c = s[i];
+    const a = { cons: [], halant: false, vsign: "", ind: "", mods: [], other: "" };
+    if (DV_CONS_IAST[c]) {
+      a.cons.push(c); i++;
+      while (s[i] === VIRAMA && DV_CONS_IAST[s[i + 1]]) { a.cons.push(s[i + 1]); i += 2; }
+      if (s[i] === VIRAMA) { a.halant = true; i++; }
+      if (DV_VSIGN[s[i]]) { a.vsign = s[i]; i++; }
+    } else if (DV_IND[c]) { a.ind = c; i++; }
+    else { a.other = c; i++; }
+    while (DV_MOD[s[i]]) { a.mods.push(s[i]); i++; }
+    a.text = (a.other || a.ind || a.cons.join(VIRAMA) + (a.halant ? VIRAMA : "") + a.vsign) + a.mods.join("");
+    out.push(a);
+  }
+  return out;
+}
+function writingSteps(a) {
+  const steps = [];   // [보이는 모양, 설명]
+  if (a.other) return [[a.other, a.other === "ॐ" ? "옴(ॐ) — 한 덩어리로 익히는 특수 글자" : "기호"]];
+  if (a.ind) steps.push([a.ind, `모음 글자 ${DV_IND[a.ind]}`]);
+  const cons = a.cons.slice();
+  let reph = false, rakar = false;
+  if (cons.length > 1 && cons[0] === "र") { reph = true; cons.shift(); }
+  const lig = LIGATURE[cons.join(VIRAMA)];
+  if (!lig && cons.length > 1 && cons[cons.length - 1] === "र") { rakar = true; cons.pop(); }
+  if (lig) steps.push([cons.join(VIRAMA), `합자 ${lig} — 두 글자가 합쳐진 모양으로 따로 익힘`]);
+  else cons.forEach((c, n) => steps.push(n === cons.length - 1
+    ? [c, `${DV_CONS_IAST[c]}a 글자`]
+    : [c + VIRAMA, `${DV_CONS_IAST[c]} 반쪽 글자 — 세로획을 빼고 써서 다음 글자에 붙임`]));
+  if (rakar) steps.push(["◌्र", "아래에 비스듬한 획(r 결합형)을 덧붙임"]);
+  if (a.halant) steps.push(["◌्", "모음 없이 끝나므로 아래에 비라마를 그음"]);
+  if (a.vsign) steps.push(["◌" + a.vsign, `모음 표시 ${DV_VSIGN[a.vsign]}${a.vsign === "ि" ? " — 자음 왼쪽에 오지만 자음을 쓴 다음에 씀" : ""}`]);
+  if (reph) steps.push(["र्◌", "위의 갈고리(레프, r) — 글자를 다 쓴 뒤 위에 얹음"]);
+  a.mods.forEach(m => steps.push(["◌" + m, DV_MOD[m]]));
+  return steps;
+}
+let writeOpen = true;
+try { writeOpen = localStorage.getItem("write-open") !== "0"; } catch {}
+function writingBlock(en) {
+  const parts = akshara(en.d);
+  if (!parts.length) return "";
+  let k = 0;
+  return `<details class="write" id="write"${writeOpen ? " open" : ""}>
+    <summary>쓰는 순서 <span class="write-sub">글자 ${parts.length}개 · 왼쪽부터</span></summary>
+    <ol class="ak-list">${parts.map(a => `<li class="ak">
+      <div class="ak-glyph" lang="sa">${a.text}</div>
+      <ol class="ak-steps">${writingSteps(a).map(([g, t]) => `<li><span class="st-n">${++k}</span><span class="st-g" lang="sa">${g}</span><span class="st-t">${esc(t)}</span></li>`).join("")}</ol>
+    </li>`).join("")}</ol>
+    <p class="write-end"><span class="st-n">${++k}</span><span>마지막으로 단어 전체 위에 머리줄(शिरोरेखा, śirorekhā)을 한 번에 이어 긋습니다.</span></p>
+  </details>`;
+}
+
+// 핵심 어휘(한국어 풀이)
+const CORE = RAW.trim().split("\n").map((line, id) => {
+  const [d, i, h, p, k, e, c, x] = line.split("|");
+  const t = tokens(i);
+  return {
+    key: "k" + id, src: "core", d, i, h, p, k, e, c, x: x || "", t,
+    initial: DEVA_LETTER[t[0]] || "",
+    kPlain: keyOf(i), kLoose: loose(i), ko: (h + " " + k).toLowerCase(), en: e.toLowerCase(),
+    xKey: x ? keyOf(x) : "",
+    alt: (x.match(/주격 단수 ([^\s(]+)/) || [])[1] ? keyOf(x.match(/주격 단수 ([^\s(]+)/)[1]) : ""
+  };
+});
+const CORE_BY_KEY = new Map(CORE.map(e => [e.key, e]));
+const CORE_BY_IAST = new Map(CORE.map(e => [e.i, e]));
+
+const state = { q: "", cat: "all", letter: "", sel: null, limit: PAGE_LIMIT, tab: "" };
+const $ = id => document.getElementById(id);
+const esc = s => s.replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+
+// ── 큰 사전(Apte·Monier-Williams·Edgerton) ──
+const SOURCES = {
+  a: { bit: 1, name: "Apte", dir: "ap", per: 1000, ko: "ko",
+       cite: "V. S. Apte, <em>The Practical Sanskrit-English Dictionary</em> (1890)" },
+  m: { bit: 4, name: "Monier-Williams", dir: "mw", per: 3000, ko: "komw",
+       cite: "M. Monier-Williams, <em>A Sanskrit-English Dictionary</em> (1899)" },
+  b: { bit: 8, name: "Edgerton", dir: "bhs", per: 1000, ko: "kobhs",
+       cite: "F. Edgerton, <em>Buddhist Hybrid Sanskrit Dictionary</em> (1953)" },
+};
+const DICT_CAT = { "d-a": 1 | 2, "d-m": 4, "d-b": 8 };
+const META_PER = 4000;
+const SLP_ORDER = "aAiIuUfFxXeEoOM~HkKgGNcCjJYwWqQRtTdDnpPbBmyrlLvSzsh";
+const RANK_CH = Object.fromEntries([...SLP_ORDER].map((c, n) => [c, String.fromCharCode(48 + n)]));
+const TOKEN_SLP = Object.fromEntries(Object.entries(SLP_IAST).filter(([k]) => /[A-Za-z]/.test(k)).map(([k, v]) => [v, k]));
+const SLP_PLAIN = {a:"a",A:"a",i:"i",I:"i",u:"u",U:"u",f:"r",F:"r",x:"l",X:"l",e:"e",E:"ai",o:"o",O:"au",M:"m",H:"h","~":"m",
+  k:"k",K:"kh",g:"g",G:"gh",N:"n",c:"c",C:"ch",j:"j",J:"jh",Y:"n",w:"t",W:"th",q:"d",Q:"dh",R:"n",t:"t",T:"th",d:"d",D:"dh",n:"n",
+  p:"p",P:"ph",b:"b",B:"bh",m:"m",y:"y",r:"r",l:"l",L:"l",v:"v",S:"s",z:"s",s:"s",h:"h"};
+const slpPlain = s => { let o = ""; for (const c of s) o += SLP_PLAIN[c] ?? ""; return o.replace(/sh/g, "s"); };
+const slpRank = s => { let o = ""; for (const c of s) o += RANK_CH[c] ?? ""; return o; };
+const coreRank = e => e.rank ??= e.t.map(t => RANK_CH[TOKEN_SLP[t]] ?? "").join("");
+const SLP_INITIAL = Object.fromEntries(Object.entries(TOKEN_SLP).map(([t, c]) => [c, DEVA_LETTER[t] || ""]));
+
+let DICT = null, dictStatus = "loading";
+function loadDict() {
+  return fetch("dict/heads.txt").then(r => { if (!r.ok) throw new Error(r.status); return r.text(); }).then(text => {
+    const lines = text.split("\n").filter(Boolean), N = lines.length;
+    const disp = new Array(N), key = new Array(N), plainK = new Array(N), mask = new Uint8Array(N);
+    const keyIndex = new Map(), letters = new Map();
+    for (let h = 0; h < N; h++) {
+      const tab = lines[h].indexOf("\t");
+      disp[h] = lines[h].slice(0, tab);
+      key[h] = disp[h].includes("-") ? disp[h].replace(/-/g, "") : disp[h];
+      mask[h] = +lines[h].slice(tab + 1);
+      plainK[h] = slpPlain(key[h]);
+      if (!keyIndex.has(key[h])) keyIndex.set(key[h], h);
+      const first = key[h][0] === "~" ? "M" : key[h][0];
+      const l = SLP_INITIAL[first] || "";
+      if (!letters.has(l)) letters.set(l, [h, h + 1]); else letters.get(l)[1] = h + 1;
+    }
+    const byPlain = Int32Array.from({ length: N }, (_, n) => n).sort((a, b) => plainK[a] < plainK[b] ? -1 : plainK[a] > plainK[b] ? 1 : a - b);
+    const counts = { "d-a": 0, "d-m": 0, "d-b": 0 };
+    for (let h = 0; h < N; h++) for (const c in DICT_CAT) if (mask[h] & DICT_CAT[c]) counts[c]++;
+    DICT = { N, disp, key, plainK, mask, keyIndex, letters, byPlain, counts };
+    dictStatus = "ready";
+  }).catch(() => { dictStatus = "error"; });
+}
+
+const metaCache = new Map(), chunkCache = new Map();
+function fetchJson(url, cache) {
+  if (!cache.has(url)) cache.set(url, fetch(url).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .catch(err => { cache.delete(url); throw err; }));
+  return cache.get(url);
+}
+const metaUrl = h => `dict/m/m${String(Math.floor(h / META_PER)).padStart(3, "0")}.json`;
+const metaLoaded = new Map();   // 청크 번호 → 배열(목록에서 바로 쓰려고)
+function getMeta(h) {
+  const c = Math.floor(h / META_PER);
+  return fetchJson(metaUrl(h), metaCache).then(arr => { metaLoaded.set(c, arr); return arr[h % META_PER]; });
+}
+const metaNow = h => metaLoaded.get(Math.floor(h / META_PER))?.[h % META_PER];
+function record(src, n) {
+  const S = SOURCES[src];
+  return fetchJson(`dict/${S.dir}/e${String(Math.floor(n / S.per)).padStart(3, "0")}.json`, chunkCache).then(arr => arr[n % S.per]);
+}
+
+// 표제어 하나를 화면용 객체로
+const headCache = new Map();
+function headItem(h) {
+  if (headCache.has(h)) return headCache.get(h);
+  const key = DICT.key[h], iDisp = slpToIast(DICT.disp[h]), i = slpToIast(key);
+  const stem = i.replace(/[ḥṃ]$/, "");
+  const it = { key: "h" + h, src: "dict", h, d: slpToDeva(key), i, iDisp, stem, mask: DICT.mask[h] };
+  headCache.set(h, it);
+  return it;
+}
+const itemByKey = k => k?.[0] === "h" ? (DICT ? headItem(+k.slice(1)) : null) : CORE_BY_KEY.get(k);
+
+// ── 검색 ──
+const VIRAMA_RE = /्$/;
+function devaToIast(w) {
+  let out = "";
+  for (const a of akshara(w)) {
+    if (a.other) out += a.other === "ॐ" ? "oṃ" : a.other;
+    else if (a.ind) out += DV_IND[a.ind];
+    else out += a.cons.map(c => DV_CONS_IAST[c]).join("") + (a.halant ? "" : (a.vsign ? DV_VSIGN[a.vsign] : "a"));
+    out += a.mods.map(m => ({ "ं": "ṃ", "ः": "ḥ", "ँ": "ṃ" }[m] || "")).join("");
+  }
+  return out;
+}
+function prepareQuery(q) {
+  const raw = q.trim().toLowerCase();
+  if (!raw) return null;
+  const isDeva = /[ऀ-ॿ]/.test(raw);
+  const isHangul = /[가-힣]/.test(raw);
+  // 데바나가리로 쳤으면 끝 a를 빼고(धर्म → dharm…) 로마자 검색으로 바꿈
+  const asIast = isDeva ? devaToIast(raw.replace(/[ःं]$/, "")).replace(VIRAMA_RE.test(raw) ? /$/ : /a$/, "") : raw;
+  const base = keyOf(asIast);
+  const variants = new Set([base]);
+  if (!isDeva) {
+    for (const v of [...variants]) {
+      variants.add(v.replace(/ri/g, "r"));
+      variants.add(v.replace(/ch(?!h)/g, "c"));
+      variants.add(v.replace(/ri/g, "r").replace(/ch(?!h)/g, "c"));
+      variants.add(v.replace(/w/g, "v").replace(/ee/g, "i").replace(/oo/g, "u"));
+    }
+  }
+  variants.delete("");
+  return {
+    raw, isDeva, isHangul, qk: keyOf(raw), ql: plain(raw), devaKey: isDeva ? base : "",
+    variants: [...variants],
+    enRe: /^[a-z][a-z '-]*$/.test(raw) && raw.length >= 3 ? new RegExp("\\b" + raw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) : null
+  };
+}
+function scoreCore(en, Q) {
+  const { raw, isDeva, qk, ql, enRe } = Q;
+  if (isDeva) {
+    const d = en.d.replace(/[ःं]$/, "");
+    if (en.d === raw || d === raw) return 100;
+    if (en.d.startsWith(raw)) return 80;
+    if (en.d.includes(raw) || en.x.includes(raw)) return 50;
+    return 0;
+  }
+  let s = 0;
+  if (qk) {
+    if (en.kPlain === qk || en.kLoose === ql || (en.alt && en.alt === qk)) s = 100;
+    else if (en.kPlain.startsWith(qk) || en.kLoose.startsWith(ql)) s = 80;
+    else if (en.kPlain.includes(qk) || en.kLoose.includes(ql)) s = 50;
+  }
+  if (en.h === raw) s = Math.max(s, 100);
+  if (en.ko.includes(raw)) s = Math.max(s, en.h.startsWith(raw) ? 75 : 60);
+  if (qk.length >= 3 && en.xKey && en.xKey.includes(qk)) s = Math.max(s, 45);
+  if (enRe && enRe.test(en.en)) s = Math.max(s, 30);
+  return s;
+}
+// 정렬된 로마자 키에서 접두어 찾기(이진 탐색)
+function prefixHits(q, cap) {
+  const { byPlain, plainK } = DICT;
+  let lo = 0, hi = byPlain.length;
+  while (lo < hi) { const mid = (lo + hi) >> 1; if (plainK[byPlain[mid]] < q) lo = mid + 1; else hi = mid; }
+  const out = [];
+  for (let n = lo; n < byPlain.length && out.length < cap; n++) {
+    const h = byPlain[n];
+    if (!plainK[h].startsWith(q)) break;
+    out.push(h);
+  }
+  return out;
+}
+let AP_EN = null, apEnStatus = "idle";
+function loadApEnglish() {
+  if (apEnStatus !== "idle") return;
+  apEnStatus = "loading";
+  fetch("dict/ap-index.json").then(r => r.json()).then(rows => {
+    AP_EN = rows.map(([k, s]) => [k, s.toLowerCase()]);
+    apEnStatus = "ready";
+    if (state.q) render();
+  }).catch(() => { apEnStatus = "error"; });
+}
+function catAllowsCore(cat) { return cat === "all" || !(cat in DICT_CAT); }
+function catMask(cat) { return cat === "all" ? 0xff : DICT_CAT[cat] || 0; }
+
+// 결과: { total, items(state.limit개까지) }
+function filtered() {
+  const Q = prepareQuery(state.q);
+  const coreOK = catAllowsCore(state.cat), mask = catMask(state.cat);
+  const coreList = coreOK ? CORE.filter(e => (state.cat === "all" || e.c === state.cat) && (!state.letter || e.initial === state.letter)) : [];
+  if (Q) {
+    const res = [];
+    for (const en of coreList) { const s = scoreCore(en, Q); if (s > 0) res.push([s, 0, en]); }
+    if (DICT && mask && !Q.isHangul) {
+      const seen = new Set();
+      for (const v of Q.variants) {
+        for (const h of prefixHits(v, 4000)) {
+          if (seen.has(h) || !(DICT.mask[h] & mask)) continue;
+          seen.add(h);
+          const exact = DICT.plainK[h] === v || (Q.isDeva && DICT.plainK[h] === v + "a");
+          res.push([exact ? 100 : 80, 1 + DICT.plainK[h].length, h]);
+        }
+      }
+      if (Q.enRe) {
+        if (AP_EN) {
+          let n = 0;
+          for (const [k, s] of AP_EN) {
+            if (!Q.enRe.test(s)) continue;
+            const h = DICT.keyIndex.get(k);
+            if (h === undefined || seen.has(h) || !(DICT.mask[h] & mask)) continue;
+            seen.add(h); res.push([20, 1, h]);
+            if (++n >= 600) break;
+          }
+        } else loadApEnglish();
+      }
+    }
+    const lf = state.letter;
+    const kept = lf ? res.filter(r => typeof r[2] !== "number" || headItemLetter(r[2]) === lf) : res;
+    kept.sort((a, b) => b[0] - a[0] || a[1] - b[1] ||
+      (typeof a[2] === "number" ? (typeof b[2] === "number" ? a[2] - b[2] : 1) : (typeof b[2] === "number" ? -1 : compareTokens(a[2].t, b[2].t))));
+    return { total: kept.length, items: kept.slice(0, state.limit).map(r => typeof r[2] === "number" ? headItem(r[2]) : r[2]) };
+  }
+  // 검색어 없이 둘러보기: 핵심 어휘와 사전 표제어를 자모 순으로 섞어서
+  coreList.sort((a, b) => compareTokens(a.t, b.t));
+  let start = 0, end = 0;
+  if (DICT && mask) {
+    [start, end] = state.letter ? (DICT.letters.get(state.letter) || [0, 0]) : [0, DICT.N];
+  }
+  let headTotal = 0;
+  if (end > start) {
+    if (mask === 0xff) headTotal = end - start;
+    else for (let h = start; h < end; h++) if (DICT.mask[h] & mask) headTotal++;
+  }
+  const items = [];
+  let ci = 0, h = start;
+  const nextHead = () => { while (h < end && !(DICT.mask[h] & mask)) h++; return h < end ? h : -1; };
+  while (items.length < state.limit) {
+    const hh = nextHead(), ce = coreList[ci];
+    if (hh < 0 && !ce) break;
+    if (hh < 0 || (ce && coreRank(ce) <= slpRank(DICT.key[hh]))) { items.push(ce); ci++; }
+    else { items.push(headItem(hh)); h++; }
+  }
+  return { total: coreList.length + headTotal, items };
+}
+const headItemLetter = h => SLP_INITIAL[DICT.key[h][0]] || "";
+
+// ── 화면 ──
+function renderCats() {
+  const counts = {};
+  CORE.forEach(e => counts[e.c] = (counts[e.c] || 0) + 1);
+  if (DICT) Object.assign(counts, DICT.counts);
+  const total = CORE.length + (DICT ? DICT.N : 0);
+  $("cats").innerHTML = CATS.map(([key, name]) =>
+    `${key === "d-a" ? '<span class="chip-sep" aria-hidden="true"></span>' : ""}<button type="button" class="chip${key in DICT_CAT ? " chip-dict" : ""}" data-cat="${key}" aria-pressed="${state.cat === key}">${name}<span class="n">${(key === "all" ? total : counts[key] || 0).toLocaleString()}</span></button>`
+  ).join("");
+}
+function renderVarna() {
+  const present = new Set();
+  if (catAllowsCore(state.cat)) CORE.forEach(e => { if (state.cat === "all" || e.c === state.cat) present.add(e.initial); });
+  if (DICT && catMask(state.cat)) DICT.letters.forEach((_, l) => present.add(l));
+  const letters = ORDER.map(t => DEVA_LETTER[t]).filter(l => l && present.has(l));
+  const firstCons = letters.findIndex(l => !VOWELS.some(v => DEVA_LETTER[v] === l));
+  $("varna").innerHTML = `<button type="button" class="all" data-letter="" aria-pressed="${!state.letter}" title="첫 글자 구분 없이 모두 보기">All</button><span class="gap" aria-hidden="true"></span>` + letters.map((l, n) =>
+    (n === firstCons ? '<span class="gap" aria-hidden="true"></span>' : "") +
+    `<button type="button" data-letter="${l}" aria-pressed="${state.letter === l}" title="${l}(으)로 시작하는 단어">${l}</button>`
+  ).join("");
+}
+function renderCount(total) {
+  const dictNote = dictStatus === "ready" ? ` · 사전 표제어 ${DICT.N.toLocaleString()}` : dictStatus === "loading" ? " · 큰 사전 불러오는 중…" : " · 큰 사전을 불러오지 못함";
+  const filteredNow = state.q || state.letter || state.cat !== "all";
+  $("count").textContent = filteredNow ? `결과 ${total.toLocaleString()}개` : `핵심 어휘 ${CORE.length}${dictNote}`;
+}
+const BADGE = it => it.src === "core" ? (it.p === "√" ? '<span class="src">어근</span>' : '<span class="src src-ko">한국어</span>')
+  : [it.mask & 1 ? "Apte" : it.mask & 2 ? "Apte 합성어" : "", it.mask & 4 ? "MW" : "", it.mask & 8 ? "Edgerton" : ""]
+      .filter(Boolean).map(b => `<span class="src">${b}</span>`).join("");
+function renderList({ total, items }) {
+  renderCount(total);
+  if (!items.length) {
+    $("list").innerHTML = `<li class="empty">${state.q && /[가-힣]/.test(state.q) ? "한글로는 핵심 어휘만 찾습니다. 로마자나 데바나가리로도 찾아보세요." : "맞는 단어가 없습니다. 철자를 줄이거나 분류·첫 글자 선택을 풀어 보세요."}</li>`;
+    return;
+  }
+  const need = new Set();
+  $("list").innerHTML = items.map(en => {
+    let gloss = en.k;
+    if (en.src === "dict") { const m = metaNow(en.h); gloss = m ? m[0] : ""; if (!m) need.add(en.h); }
+    return `<li><button type="button" class="item" data-key="${en.key}" aria-current="${state.sel === en.key}">
+      <span class="d" translate="no">${en.d}</span><span class="i" translate="no">${esc(en.iDisp || en.i)}${BADGE(en)}</span>
+      <span class="k"${en.src === "dict" ? ` data-h="${en.h}" lang="en"` : ' translate="no"'}>${esc(gloss || "")}</span></button></li>`;
+  }).join("") + (total > items.length
+    ? `<li class="more"><button type="button" class="btn" id="more">${items.length.toLocaleString()} / ${total.toLocaleString()}개 표시 중 · 더 보기</button></li>` : "");
+  // 짧은 뜻은 4000개 단위 파일에 있어서, 화면에 보이는 것만 불러와 채움
+  const chunks = new Set([...need].map(h => Math.floor(h / META_PER)));
+  chunks.forEach(c => getMeta(c * META_PER).then(() => {
+    document.querySelectorAll("#list .k[data-h]").forEach(el => {
+      const m = metaNow(+el.dataset.h); if (m && !el.textContent) el.textContent = m[0];
+    });
+  }, () => {}));
+}
+
+// ── 한국어 풀이(자동 번역): 사전·기록 번호별로 db에 20개씩 묶어 저장 ──
+const KO_BUCKET = 20;
+const koCache = new Map(), koPending = new Map(), koError = new Map();
+let samplePromise = null, dbPromise = null, sampleBlocked = false;
+const useCap = name => window.claude?.use ? window.claude.use(name).catch(() => null) : Promise.resolve(null);
+const getSample = () => samplePromise ??= useCap("sample");
+const getDb = () => dbPromise ??= useCap("db");
+const koId = (src, n) => `${src}:${n}`;
+const bucketRef = (db, src, n) => db.doc(`${SOURCES[src].ko}/b${Math.floor(n / KO_BUCKET)}`);
+let bakedPromise = null;
+const getBaked = () => bakedPromise ??= fetch("dict/ko.json").then(r => r.ok ? r.json() : {}).catch(() => ({}));
+async function readKorean(src, n) {
+  const id = koId(src, n);
+  if (koCache.has(id)) return koCache.get(id);
+  const db = await getDb();
+  if (!db) {
+    const v = (await getBaked())[id];
+    if (v && Array.isArray(v.senses)) { koCache.set(id, v); return v; }
+    return null;
+  }
+  try {
+    const snap = await bucketRef(db, src, n).get();
+    const v = snap.exists ? snap.data()[n] : undefined;
+    if (v && Array.isArray(v.senses)) { koCache.set(id, v); return v; }
+  } catch {}
+  return null;
+}
+async function saveKorean(src, n, val) {
+  koCache.set(koId(src, n), val);
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    const ref = bucketRef(db, src, n);
+    const snap = await ref.get();
+    await ref.set({ ...(snap.exists ? snap.data() : {}), [n]: val });
+    return true;
+  } catch { return false; }
+}
+const htmlText = (html, max = 8000) => {
+  const div = document.createElement("div");
+  div.innerHTML = html.split('<span class="comp">')[0].replace(/<b>([^<]*)<\/b>/g, " [$1] ");
+  return div.textContent.replace(/\s+/g, " ").trim().slice(0, max);
+};
+let koCtx = null;   // 지금 상세 화면의 {key, src, ids}
+function paintKo() {
+  const box = $("ko-trans");
+  if (!box || !koCtx || state.sel !== koCtx.key) return;
+  const id = koId(koCtx.src, koCtx.ids[0]);
+  const head = extra => `<div class="ko-head"><span class="ko-title">한국어 풀이</span><span class="ko-from">${SOURCES[koCtx.src].name} 기준</span>${extra || ""}</div>`;
+  const val = koCache.get(id), note = koError.get(id);
+  if (koPending.has(id)) {
+    box.innerHTML = head() + `<p class="ko-note">Claude가 한국어로 옮기는 중입니다. 보통 10~40초 걸립니다.</p>
+      <button type="button" class="btn" data-ko="stop">그만두기</button>`;
+  } else if (val) {
+    box.innerHTML = head('<span class="auto">AI 번역 · 미검수</span>') +
+      (val.summary ? `<p class="ko-sum">${esc(String(val.summary))}</p>` : "") +
+      `<ol class="ko-senses">${val.senses.map(s => `<li>${esc(String(s))}</li>`).join("")}</ol>` +
+      (note ? `<p class="ko-note">${esc(note)}</p>` : "") +
+      (sampleBlocked ? "" : `<button type="button" class="btn btn-quiet" data-ko="redo">다시 번역</button>`);
+  } else if (sampleBlocked || !window.claude?.use) {
+    box.innerHTML = head() + `<p class="ko-note">아직 정리된 한국어 풀이가 없습니다. 크롬의 <b>한국어로 번역</b>을 켜면 아래 영어 풀이가 한국어로 바뀝니다. 기계 번역이라 어색하면 '영어 원문 그대로 보기'와 비교하세요.</p>`;
+  } else {
+    box.innerHTML = head() + `<p class="ko-note">${esc(note || "아직 한국어 풀이가 없습니다. 누르면 Claude가 아래 사전 풀이를 한국어로 옮기고, 저장해 두었다가 다음부터 바로 보여 줍니다.")}</p>
+      <button type="button" class="btn btn-primary" data-ko="go">한국어로 풀이하기</button>`;
+  }
+}
+async function translateKo(ctx, en, redo) {
+  const sample = await getSample();
+  if (!sample) { sampleBlocked = true; paintKo(); return; }
+  const id = koId(ctx.src, ctx.ids[0]), ctl = new AbortController();
+  koPending.set(id, ctl); koError.delete(id); paintKo();
+  try {
+    const recs = await Promise.all(ctx.ids.slice(0, 40).map(n => record(ctx.src, n)));
+    const text = recs.map(r => htmlText(typeof r === "string" ? r : r[r.length - 1], 3000)).join(" | ").slice(0, 8000);
+    const prompt = `다음은 ${SOURCES[ctx.src].name} 산스크리트-영어 사전의 '${en.i}' 항목입니다. 한국어 사용자가 읽을 수 있게 한국어로 옮겨 주세요.
+
+규칙:
+- 원문의 뜻 번호([1], [2] …)나 '|'로 나뉜 뜻 순서대로, 뜻 하나당 senses 배열의 항목 하나로 옮깁니다. 비슷한 뜻은 합쳐도 되고, 너무 많으면 중요한 뜻 위주로 15개 이내로 줄입니다.
+- 각 항목은 자연스러운 한국어로 간결하게 씁니다. 번호 표시는 넣지 않습니다.
+- 산스크리트 단어와 인용문은 IAST 로마자 그대로 두고, 필요하면 괄호 안에 짧은 한국어 뜻을 붙입니다.
+- 불교·인도 철학 용어는 한국에서 통용되는 번역어를 씁니다(예: 열반, 업, 반야, 관정).
+- 사람·신·지명 같은 고유명사는 한글 음역 뒤 괄호에 IAST를 적습니다.
+- 원문에 없는 뜻을 보태지 않습니다. 어원 설명과 문법 약어는 옮기지 않아도 됩니다.
+
+JSON 하나로만 답하세요. 형식: {"summary": "대표 뜻을 30자 이내로", "senses": ["첫째 뜻", "둘째 뜻"]}
+
+원문: ${text}`;
+    const out = await sample.json(prompt, { signal: ctl.signal, cache: redo ? false : true });
+    const senses = Array.isArray(out?.senses) ? out.senses.map(s => String(s).trim()).filter(Boolean) : [];
+    if (!senses.length) throw { code: "invalid_json" };
+    const val = { summary: String(out.summary || "").trim(), senses, at: new Date().toISOString() };
+    if (!(await saveKorean(ctx.src, ctx.ids[0], val))) koError.set(id, "번역은 됐지만 저장하지 못했습니다(저장 권한이 없을 수 있습니다). 페이지를 닫으면 사라집니다.");
+  } catch (e) {
+    const code = e?.code;
+    if (["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"].includes(code)) sampleBlocked = true;
+    else if (code !== "cancelled") koError.set(id,
+      code === "rate_limited" ? "요청이 많아 잠시 막혔습니다. 조금 뒤에 다시 눌러 주세요."
+      : code === "session_expired" ? "로그인이 만료됐습니다. 다시 로그인한 뒤 눌러 주세요."
+      : "번역하지 못했습니다. 다시 눌러 보세요.");
+  } finally {
+    koPending.delete(id);
+    paintKo();
+  }
+}
+
+// ── 상세 ──
+function actionsHtml() {
+  return `<div class="actions"><button type="button" class="btn" id="copy">표제어 복사</button><span class="status" id="copy-status" role="status"></span></div>`;
+}
+function coreDetail(en) {
+  let extra = "";
+  if (en.x) {
+    if (en.c === "root") {
+      const [dv, form, ...note] = en.x.split(" ");
+      extra = `<dt>현재 3인칭 단수</dt><dd><span class="deva-inline">${dv}</span> <span class="iast-inline">${esc(form)}</span>${note.length ? " " + esc(note.join(" ")) : ""}</dd>`;
+    } else extra = `<dt>참고</dt><dd>${esc(en.x)}</dd>`;
+  }
+  let link = "";
+  if (DICT) {
+    const slp = en.t.map(t => TOKEN_SLP[t] ?? "").join("");
+    const h = DICT.keyIndex.get(slp) ?? DICT.keyIndex.get(slp.replace(/[HM]$/, ""));
+    if (h !== undefined) link = `<div class="xref"><span class="xref-label">사전 원문</span><button type="button" class="btn" data-goto="h${h}"><span class="deva-inline">${slpToDeva(DICT.key[h])}</span> ${esc(slpToIast(DICT.disp[h]))} · ${[DICT.mask[h] & 1 ? "Apte" : "", DICT.mask[h] & 4 ? "Monier-Williams" : "", DICT.mask[h] & 8 ? "Edgerton" : ""].filter(Boolean).join(" · ")}</button></div>`;
+  }
+  $("detail").innerHTML = `
+    <div class="hw"><div class="d" lang="sa">${en.d}</div><div class="i">${esc(en.i)}</div><div class="h">${esc(en.h)}</div></div>
+    <div class="tags"><span class="tag pos">${en.p === "√" ? "" : esc(en.p) + " "}${POS[en.p] || ""}</span><span class="tag">${CAT_NAME[en.c]}</span></div>
+    ${pronBlock(en)}
+    <dl><dt>뜻</dt><dd class="ko">${esc(en.k)}</dd><dt>영어</dt><dd class="en">${esc(en.e)}</dd>${extra}</dl>
+    ${link}
+    ${writingBlock(en)}
+    ${actionsHtml()}`;
+}
+function headDetail(en) {
+  const core = CORE_BY_IAST.get(en.i) || CORE_BY_IAST.get(en.stem);
+  $("detail").innerHTML = `
+    <div class="hw"><div class="d" lang="sa">${en.d}</div><div class="i">${esc(en.iDisp)}</div>
+      <div class="h">${esc(toHangul(en.stem))} <span class="auto">자동 음역</span></div></div>
+    ${pronBlock({ i: en.stem, d: en.d })}
+    ${core ? `<div class="xref"><span class="xref-label">한국어 풀이</span><button type="button" class="btn" data-goto="${core.key}"><span class="deva-inline">${core.d}</span> ${esc(core.i)} · ${esc(core.k.split(/[,;]/)[0])}</button></div>` : ""}
+    <div id="dict-area"><p class="loading">사전 풀이를 불러오는 중…</p></div>
+    ${writingBlock({ d: en.d.replace(/[ःं]$/, "") })}
+    ${actionsHtml()}`;
+  const key = en.key;
+  getMeta(en.h).then(meta => {
+    if (state.sel !== key) return;
+    const [, aIds, mIds, bIds, comps] = meta;
+    const avail = [["a", aIds], ["m", mIds], ["b", bIds]].filter(([, ids]) => ids.length);
+    if (!avail.find(([s]) => s === state.tab)) state.tab = avail[0]?.[0] || "";
+    const compNote = comps.length ? `<p class="comp-note">Apte 사전에서는 ${comps.map(([, ph]) =>
+      `<button type="button" class="linkish" data-goto="h${ph}">${esc(slpToIast(DICT.disp[ph]))}</button>`).join(", ")} 항목 안에 합성어로 실려 있습니다.</p>` : "";
+    if (!avail.length) {
+      koCtx = null;
+      $("dict-area").innerHTML = compNote;
+      protect($("detail"));
+      return;
+    }
+    $("dict-area").innerHTML = `
+      ${compNote}
+      <div class="src-tabs" role="tablist">${avail.map(([s, ids]) =>
+        `<button type="button" role="tab" class="src-tab" data-tab="${s}" aria-selected="${s === state.tab}">${SOURCES[s].name}<span class="n">${ids.length > 1 ? ids.length : ""}</span></button>`).join("")}</div>
+      <section class="ko-trans" id="ko-trans" aria-live="polite"><p class="ko-note">한국어 풀이를 확인하는 중…</p></section>
+      <div class="dict-body" id="dict-body" lang="en"><p class="loading" translate="no">본문을 불러오는 중…</p></div>
+      <details class="orig" translate="no"><summary lang="ko">영어 원문 그대로 보기 <span class="orig-sub">번역이 이상할 때 비교하세요</span></summary><div class="dict-body" id="orig-body" lang="en"></div></details>
+      <p class="credit">${SOURCES[state.tab].cite}. <a href="https://www.sanskrit-lexicon.uni-koeln.de/" target="_blank" rel="noopener">Cologne Digital Sanskrit Dictionaries</a> 디지털판, CC BY-SA 4.0. 인용 출처 약어는 생략했습니다.</p>`;
+    protect($("detail"));
+    const ids = avail.find(([s]) => s === state.tab)[1];
+    koCtx = { key, src: state.tab, ids };
+    const id = koId(state.tab, ids[0]);
+    if (koCache.has(id)) paintKo(); else readKorean(state.tab, ids[0]).then(paintKo);
+    const src = state.tab;
+    Promise.all(ids.slice(0, 120).map(n => record(src, n))).then(recs => {
+      if (state.sel !== key || state.tab !== src || !$("dict-body")) return;
+      let html;
+      if (src === "a") html = recs.map(r => `<div class="rec">${r.replace('<span class="comp">Comp.</span>', '<span class="comp">합성어</span>')}</div>`).join("");
+      else {
+        let prev = "";
+        html = `<ol class="mw-list">${recs.map(r => {
+          const disp = r[0], body = r[r.length - 1];
+          const sub = disp !== prev ? `<span class="sub-hw">${esc(slpToIast(disp))}</span> ` : "";
+          prev = disp;
+          return `<li>${sub}${body}</li>`;
+        }).join("")}</ol>`;
+      }
+      if (ids.length > 120) html += `<p class="loading" translate="no">기록이 많아 앞의 120개만 보여 줍니다.</p>`;
+      $("dict-body").innerHTML = html;
+      $("orig-body").innerHTML = html;
+      protect($("dict-body"));
+    }, () => {
+      if (state.sel === key && $("dict-body")) $("dict-body").innerHTML = `<p class="loading">본문을 불러오지 못했습니다. 인터넷 연결을 확인하고 단어를 다시 눌러 보세요.</p>`;
+    });
+  }, () => {
+    if (state.sel === key && $("dict-area")) $("dict-area").innerHTML = `<p class="loading">사전 풀이를 불러오지 못했습니다. 단어를 다시 눌러 보세요.</p>`;
+  });
+}
+// 크롬 번역이 원어와 한국어 화면을 건드리지 않게
+function protect(root) {
+  root?.querySelectorAll(':scope > :not(#dict-area):not(#dict-body), #dict-area > :not(#dict-body), i.sa, .sub-hw, .lex, b, .comp, .see')
+    .forEach(el => { el.setAttribute("translate", "no"); el.classList.add("notranslate"); });
+}
+function renderDetail() {
+  const en = itemByKey(state.sel);
+  koCtx = null;
+  if (!en) { $("detail").innerHTML = `<p class="empty">목록에서 단어를 고르세요.</p>`; return; }
+  if (en.src === "core") { coreDetail(en); $("detail").setAttribute("translate", "no"); }
+  else { headDetail(en); $("detail").removeAttribute("translate"); }
+  protect($("detail"));
+  $("copy").onclick = () => {
+    const gloss = en.src === "core" ? en.k : (metaNow(en.h)?.[0] || "");
+    const text = `${en.d} ${en.iDisp || en.i}${gloss ? " — " + gloss : ""}`;
+    const fallback = () => {
+      const r = document.createRange(); r.selectNodeContents(document.querySelector(".hw"));
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      $("copy-status").textContent = "선택해 두었습니다. Ctrl+C로 복사하세요";
+    };
+    try { navigator.clipboard.writeText(text).then(() => { $("copy-status").textContent = "복사했습니다"; }, fallback); }
+    catch { fallback(); }
+  };
+}
+function scrollToCurrent() {
+  const el = document.querySelector('.item[aria-current="true"]'), list = $("list");
+  if (el && getComputedStyle(list).overflowY === "auto") list.scrollTop = el.offsetTop - list.clientHeight / 3;
+}
+let lastSel = null;
+function render() {
+  const res = filtered();
+  if (state.sel === null && res.items.length) state.sel = res.items[0].key;
+  renderList(res);
+  if (state.sel !== lastSel || !$("detail").firstElementChild) { renderDetail(); lastSel = state.sel; }
+  document.querySelectorAll("#cats .chip").forEach(b => b.setAttribute("aria-pressed", b.dataset.cat === state.cat));
+  document.querySelectorAll("#varna button").forEach(b => b.setAttribute("aria-pressed", b.dataset.letter === state.letter));
+}
+function select(key) {
+  state.sel = key; lastSel = null; render();
+  if (matchMedia("(max-width: 760px)").matches) $("detail").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function goTo(key) {
+  const target = itemByKey(key);
+  if (!target) return;
+  // 목록에 없을 수 있으니 검색어를 그 단어로 바꿔서 보이게 함
+  const q = target.src === "core" ? target.i : target.stem;
+  state.q = q; $("q").value = q; state.cat = "all"; state.letter = ""; state.limit = PAGE_LIMIT;
+  renderVarna(); select(key); scrollToCurrent();
+}
+
+let typing;
+$("q").addEventListener("input", e => {
+  clearTimeout(typing);
+  typing = setTimeout(() => { state.q = e.target.value; state.sel = null; state.limit = PAGE_LIMIT; render(); }, 150);
+});
+$("cats").addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  state.cat = b.dataset.cat; state.letter = ""; state.sel = null; state.limit = PAGE_LIMIT;
+  renderVarna(); render();
+});
+$("varna").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const l = b.dataset.letter;
+  state.letter = !l || state.letter === l ? "" : l; state.sel = null; state.limit = PAGE_LIMIT; render();
+});
+$("list").addEventListener("click", e => {
+  if (e.target.closest("#more")) { state.limit += PAGE_LIMIT * 2; render(); return; }
+  const b = e.target.closest(".item"); if (b) select(b.dataset.key);
+});
+$("detail").addEventListener("toggle", e => {
+  if (e.target.id !== "write") return;
+  writeOpen = e.target.open;
+  try { localStorage.setItem("write-open", writeOpen ? "1" : "0"); } catch {}
+}, true);
+$("detail").addEventListener("click", e => {
+  const sp = e.target.closest("[data-speak]");
+  if (sp) { speak(sp.dataset.speak); return; }
+  const tab = e.target.closest("[data-tab]");
+  if (tab) { state.tab = tab.dataset.tab; lastSel = null; renderDetail(); lastSel = state.sel; return; }
+  const k = e.target.closest("[data-ko]");
+  if (k && koCtx) {
+    const id = koId(koCtx.src, koCtx.ids[0]);
+    if (k.dataset.ko === "stop") koPending.get(id)?.abort();
+    else if (!koPending.has(id)) translateKo(koCtx, itemByKey(koCtx.key), k.dataset.ko === "redo");
+    return;
+  }
+  const b = e.target.closest("[data-goto]");
+  if (b) goTo(b.dataset.goto);
+});
+$("random").addEventListener("click", () => {
+  const useCore = !DICT || Math.random() < 0.4;
+  const key = useCore ? CORE[Math.floor(Math.random() * CORE.length)].key : "h" + Math.floor(Math.random() * DICT.N);
+  goTo(key);
+});
+
+if (/KAKAOTALK/i.test(navigator.userAgent)) {
+  $("kakao").hidden = false;
+  $("kakao-open").href = "kakaotalk://web/openExternal?url=" + encodeURIComponent(location.href);
+}
+renderCats(); renderVarna();
+state.sel = CORE.find(e => e.i === "dharma").key;
+render(); scrollToCurrent();
+loadDict().then(() => { renderCats(); renderVarna(); lastSel = null; render(); });
+</script>
+</body>
+</html>
