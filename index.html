@@ -169,6 +169,7 @@ footer .iast-inline { font-family: var(--f-iast); }
 .chip-sep { width: 1px; align-self: stretch; background: var(--line); margin-inline: 4px; }
 .chip-dict { border-style: dashed; }
 .chip-dict[aria-pressed="true"] { border-style: solid; }
+.search-note { padding: 10px 14px; font-size: 0.86rem; background: var(--ink-soft); color: var(--fg); border-bottom: 1px solid var(--line); }
 .item .src-lemma { color: var(--ink); border-color: var(--ink); border-style: dashed; }
 .lemma-note { margin: 0; padding: 10px 14px; border-radius: 6px; background: var(--ink-soft); font-size: 0.9rem; }
 .item .src-en { color: var(--turmeric); border-color: var(--turmeric); border-style: dashed; }
@@ -1680,7 +1681,7 @@ function enPostings(word) {   // [[단계, 표제어 번호], …] 또는 아직
   return out;
 }
 let KO_EN = null, koEnStatus = "idle";
-function koEnglish(raw) {
+function koEnglish(raw, listOnly) {
   if (!KO_EN) {
     if (koEnStatus === "idle") {
       koEnStatus = "loading";
@@ -1693,6 +1694,7 @@ function koEnglish(raw) {
   // 조사 떼기: 학교를, 물은, 산의 …
   const stripped = w.replace(/(은|는|이|가|을|를|의|에|에서|으로|로|와|과|도)$/, "");
   if (KO_EN[stripped]) return KO_EN[stripped];
+  if (listOnly) return [];
   // 낱말표에 없으면 구글 번역(한→영)으로 영어 낱말을 받아 옴(claude.ai 안에서는 막혀 있어 빈 결과)
   if (KO_DYN.has(w)) { const v = KO_DYN.get(w); return v === "loading" ? null : v; }
   KO_DYN.set(w, "loading");
@@ -1827,57 +1829,95 @@ function catAllowsCore(cat) { return cat === "all" || !(cat in DICT_CAT); }
 function catMask(cat) { return cat === "all" ? 0xff : DICT_CAT[cat] || 0; }
 
 // 결과: { total, items(state.limit개까지) }
+// 검색 한 번: 결과 목록(정렬 전)과, 한국어→영어 변환을 아직 기다리는 중인지
+function searchResults(Q, coreList, mask, listOnly) {
+  let pending = false;
+  const res = [];
+  for (const en of coreList) { const s = scoreCore(en, Q); if (s > 0) res.push([s, 0, en]); }
+  if (DICT && mask && !Q.isHangul) {
+    const seen = new Set();
+    for (const v of Q.variants) {
+      for (const h of prefixHits(v, 4000)) {
+        if (seen.has(h) || !(DICT.mask[h] & mask)) continue;
+        seen.add(h);
+        const exact = DICT.plainK[h] === v || (Q.isDeva && DICT.plainK[h] === v + "a");
+        res.push([exact ? 100 : 80, 1 + DICT.plainK[h].length, h]);
+      }
+    }
+  }
+  if (!Q.isHangul && Q.variants.length && DICT) {
+    const lk = looseOf(Q.variants[0]);
+    const have = new Set(res.map(r => typeof r[2] === "number" ? "h" + r[2] : r[2].key));
+    for (const en of coreList) if (!have.has(en.key) && (en.looseK ??= looseOf(en.kPlain)) === lk) res.push([95, 0, en]);
+    if (mask) for (const h of looseHits(lk, 400, true)) if (!have.has("h" + h) && (DICT.mask[h] & mask)) res.push([95, 1 + DICT.plainK[h].length, h]);
+  }
+  LEMMA.clear();
+  if (!Q.isHangul && Q.variants.length) {
+    const cands = [...lemmaCandidates(Q.variants[0])].sort((a, b) => a[1][1] - b[1][1]);
+    const have = new Set(res.filter(r => r[0] >= 100).map(r => typeof r[2] === "number" ? "h" + r[2] : r[2].key));
+    cands.forEach(([cand, [label]], rank) => {
+      for (const en of coreList) if (en.kPlain === cand && !have.has(en.key)) { res.push([90, rank, en]); have.add(en.key); LEMMA.set(en.key, label); }
+      if (DICT && mask) for (const h of headsByPlain(cand)) {
+        if (have.has("h" + h) || !(DICT.mask[h] & mask)) continue;
+        res.push([90, 10 + rank * 10 - sourceCount(h), h]); have.add("h" + h); LEMMA.set("h" + h, label);
+      }
+    });
+    // 활용형 후보로 다시 잡힌 항목은 접두어 결과(80점)에서 빼서 두 번 나오지 않게
+    for (let n = res.length - 1; n >= 0; n--) if (res[n][0] === 80 && typeof res[n][2] === "number" && LEMMA.has("h" + res[n][2])) res.splice(n, 1);
+  }
+  // 뜻으로 찾기: 한국어는 낱말표로 영어로 바꾼 뒤, 영어는 그대로 세 사전의 영어 뜻 색인에서
+  VIA.clear();
+  if (DICT && mask) {
+    const words = Q.isHangul ? koEnglish(Q.raw, listOnly) : Q.enList;
+    if (Q.isHangul && words === null) pending = true;
+    // 한국어로 찾을 때, 영어 뜻이 맞는 핵심 어휘(예: 교사 → teacher → ācārya)도 앞쪽에
+    if (Q.isHangul && words && words.length) {
+      const have = new Set(res.filter(r => typeof r[2] !== "number").map(r => r[2].key));
+      const re = new RegExp("\\b(" + words.join("|") + ")");
+      for (const en of coreList) if (!have.has(en.key) && re.test(en.en)) res.push([45, 0, en]);
+    }
+    const hits = words && words.length ? englishHits(words, Q.isHangul ? "any" : "all") : null;
+    if (hits) {
+      const seenNow = new Set(res.filter(r => typeof r[2] === "number").map(r => r[2]));
+      const ranked = [...hits].filter(([h]) => !seenNow.has(h) && (DICT.mask[h] & mask))
+        .sort((x, y) => x[1][0] - y[1][0] || sourceCount(y[0]) - sourceCount(x[0]) || x[0] - y[0]).slice(0, 600);
+      ranked.forEach(([h, [tier, w]], i) => {
+        VIA.set(h, w);
+        res.push([40 - tier * 10, 50 + i, h]);
+      });
+    }
+  }
+  return { res, pending };
+}
 function filtered() {
   const Q = prepareQuery(state.q);
   const coreOK = catAllowsCore(state.cat), mask = catMask(state.cat);
   const coreList = coreOK ? CORE.filter(e => (state.cat === "all" || e.c === state.cat) && (!state.letter || e.initial === state.letter)) : [];
   if (Q) {
-    const res = [];
-    for (const en of coreList) { const s = scoreCore(en, Q); if (s > 0) res.push([s, 0, en]); }
-    if (DICT && mask && !Q.isHangul) {
-      const seen = new Set();
-      for (const v of Q.variants) {
-        for (const h of prefixHits(v, 4000)) {
-          if (seen.has(h) || !(DICT.mask[h] & mask)) continue;
-          seen.add(h);
-          const exact = DICT.plainK[h] === v || (Q.isDeva && DICT.plainK[h] === v + "a");
-          res.push([exact ? 100 : 80, 1 + DICT.plainK[h].length, h]);
-        }
-      }
+    SEARCH_NOTE = "";
+    let { res, pending } = searchResults(Q, coreList, mask, false);
+    // 맞는 단어가 없을 때 대신 찾기
+    if (!res.length && !pending && !Q.isHangul && DICT && mask) {
+      const lk = looseOf(Q.variants[0] || "");
+      const near = [];
+      for (const en of coreList) if ((en.looseK ??= looseOf(en.kPlain)).startsWith(lk)) near.push([75, 0, en]);
+      for (const h of looseHits(lk, 2000, false)) if (DICT.mask[h] & mask) near.push([70, 1 + DICT.plainK[h].length, h]);
+      if (near.length) { res = near; SEARCH_NOTE = `‘${esc(Q.raw)}’과(와) 똑같은 단어가 없어서, h와 겹자음을 빼고 비슷한 철자로 찾았어요.`; }
     }
-    LEMMA.clear();
-    if (!Q.isHangul && Q.variants.length) {
-      const cands = [...lemmaCandidates(Q.variants[0])].sort((a, b) => a[1][1] - b[1][1]);
-      const have = new Set(res.filter(r => r[0] >= 100).map(r => typeof r[2] === "number" ? "h" + r[2] : r[2].key));
-      cands.forEach(([cand, [label]], rank) => {
-        for (const en of coreList) if (en.kPlain === cand && !have.has(en.key)) { res.push([90, rank, en]); have.add(en.key); LEMMA.set(en.key, label); }
-        if (DICT && mask) for (const h of headsByPlain(cand)) {
-          if (have.has("h" + h) || !(DICT.mask[h] & mask)) continue;
-          res.push([90, 10 + rank * 10 - sourceCount(h), h]); have.add("h" + h); LEMMA.set("h" + h, label);
+    if (!res.length && !pending) {
+      const chars = Array.from(Q.raw.trim());
+      const min = Math.max(2, Math.ceil(chars.length * 0.5));
+      for (let n = chars.length - 1; n >= min; n--) {
+        const t = chars.slice(0, n).join("").trim();
+        const Qt = t && prepareQuery(t);
+        if (!Qt) continue;
+        const r = searchResults(Qt, coreList, mask, true);
+        if (r.res.length) {
+          res = r.res;
+          LEMMA.clear();   // 줄인 말에 붙는 활용형 설명은 맞지 않을 수 있어서 빼 둠
+          SEARCH_NOTE = `‘${esc(Q.raw)}’에 맞는 단어가 없어서, 끝을 줄인 <b>‘${esc(t)}’</b>(으)로 찾았어요.`;
+          break;
         }
-      });
-      // 활용형 후보로 다시 잡힌 항목은 접두어 결과(80점)에서 빼서 두 번 나오지 않게
-      for (let n = res.length - 1; n >= 0; n--) if (res[n][0] === 80 && typeof res[n][2] === "number" && LEMMA.has("h" + res[n][2])) res.splice(n, 1);
-    }
-    // 뜻으로 찾기: 한국어는 낱말표로 영어로 바꾼 뒤, 영어는 그대로 세 사전의 영어 뜻 색인에서
-    VIA.clear();
-    if (DICT && mask) {
-      const words = Q.isHangul ? koEnglish(Q.raw) : Q.enList;
-      // 한국어로 찾을 때, 영어 뜻이 맞는 핵심 어휘(예: 교사 → teacher → ācārya)도 앞쪽에
-      if (Q.isHangul && words && words.length) {
-        const have = new Set(res.filter(r => typeof r[2] !== "number").map(r => r[2].key));
-        const re = new RegExp("\\b(" + words.join("|") + ")");
-        for (const en of coreList) if (!have.has(en.key) && re.test(en.en)) res.push([45, 0, en]);
-      }
-      const hits = words && words.length ? englishHits(words, Q.isHangul ? "any" : "all") : null;
-      if (hits) {
-        const seenNow = new Set(res.filter(r => typeof r[2] === "number").map(r => r[2]));
-        const ranked = [...hits].filter(([h]) => !seenNow.has(h) && (DICT.mask[h] & mask))
-          .sort((x, y) => x[1][0] - y[1][0] || sourceCount(y[0]) - sourceCount(x[0]) || x[0] - y[0]).slice(0, 600);
-        ranked.forEach(([h, [tier, w]], i) => {
-          VIA.set(h, w);
-          res.push([40 - tier * 10, 50 + i, h]);
-        });
       }
     }
     const lf = state.letter;
@@ -1907,6 +1947,29 @@ function filtered() {
     else { items.push(headItem(hh)); h++; }
   }
   return { total: coreList.length + headTotal, items };
+}
+// 비슷한 철자 키: dh→d, bh→b … 그리고 겹자음 하나로(dharma·darma, buddha·buda, sattva·satva 같게)
+const looseOf = p => p.replace(/([kgcjtdpbs])h/g, "$1").replace(/(.)\1+/g, "$1");
+let SEARCH_NOTE = "";
+function looseIndex() {
+  if (DICT.byLoose) return;
+  DICT.looseK = DICT.plainK.map(looseOf);
+  const L = DICT.looseK;
+  DICT.byLoose = Int32Array.from({ length: DICT.N }, (_, n) => n).sort((a, b) => L[a] < L[b] ? -1 : L[a] > L[b] ? 1 : a - b);
+}
+function looseHits(lk, cap, exactOnly) {
+  if (!lk) return [];
+  looseIndex();
+  const { byLoose, looseK } = DICT;
+  let lo = 0, hi = byLoose.length;
+  while (lo < hi) { const mid = (lo + hi) >> 1; if (looseK[byLoose[mid]] < lk) lo = mid + 1; else hi = mid; }
+  const out = [];
+  for (let n = lo; n < byLoose.length && out.length < cap; n++) {
+    const k = looseK[byLoose[n]];
+    if (exactOnly ? k !== lk : !k.startsWith(lk)) break;
+    out.push(byLoose[n]);
+  }
+  return out;
 }
 const headItemLetter = h => SLP_INITIAL[DICT.key[h][0]] || "";
 
@@ -1946,7 +2009,7 @@ function renderList({ total, items }) {
     return;
   }
   const need = new Set();
-  $("list").innerHTML = items.map(en => {
+  $("list").innerHTML = (SEARCH_NOTE ? `<li class="search-note" translate="no">${SEARCH_NOTE}</li>` : "") + items.map(en => {
     let gloss = en.k;
     if (en.src === "dict") { const m = metaNow(en.h); gloss = m ? m[0] : ""; if (!m) need.add(en.h); }
     return `<li><button type="button" class="item" data-key="${en.key}" aria-current="${state.sel === en.key}">
