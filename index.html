@@ -1297,6 +1297,8 @@ function prepareQuery(q) {
       variants.add(v.replace(/w/g, "v").replace(/ee/g, "i").replace(/oo/g, "u"));
     }
   }
+  // 문장 속 주격형(vidyālayaḥ, jñānam)도 찾게: 끝의 h(ḥ)·m(ṃ)을 뗀 어간도 찾음
+  for (const v of [...variants]) if (v.length > 3 && /[aiu][hm]$/.test(v)) variants.add(v.slice(0, -1));
   variants.delete("");
   return {
     raw, isDeva, isHangul, qk: keyOf(raw), ql: plain(raw), devaKey: isDeva ? base : "",
