@@ -1904,6 +1904,17 @@ function filtered() {
       for (const h of looseHits(lk, 2000, false)) if (DICT.mask[h] & mask) near.push([70, 1 + DICT.plainK[h].length, h]);
       if (near.length) { res = near; SEARCH_NOTE = `‘${esc(Q.raw)}’과(와) 똑같은 단어가 없어서, h와 겹자음을 빼고 비슷한 철자로 찾았어요.`; }
     }
+    if (!res.length && !pending && !Q.isHangul && DICT && Q.variants.length) {
+      const parts = splitCompound(Q.variants[0]);
+      if (parts) {
+        parts.forEach((p, i) => {
+          for (const en of coreList) if (en.kPlain === p) res.push([100 - i, 0, en]);
+          if (mask) headsByPlain(p).filter(h => DICT.mask[h] & mask).sort((a, b) => sourceCount(b) - sourceCount(a)).slice(0, 3)
+            .forEach((h, k) => res.push([100 - i, 1 + k, h]));
+        });
+        if (res.length) SEARCH_NOTE = `‘${esc(Q.raw)}’는 사전에 한 단어로 없어서 나눠 보면 <b>${parts.map(p => esc(partLabel(p))).join(" + ")}</b> 입니다. 조각마다 아래에서 볼 수 있어요.`;
+      }
+    }
     if (!res.length && !pending) {
       const chars = Array.from(Q.raw.trim());
       const min = Math.max(2, Math.ceil(chars.length * 0.5));
@@ -1970,6 +1981,45 @@ function looseHits(lk, cap, exactOnly) {
     out.push(byLoose[n]);
   }
   return out;
+}
+// 합성어 나누기 (plain 키 기준). 조각은 3글자 이상, 최대 6조각
+function wordAt(p) {
+  if (CORE.some(e => e.kPlain === p)) return true;
+  return !!(DICT && headsByPlain(p).length);
+}
+function splitCompound(w) {
+  const memo = new Map();
+  const go = (rest, depth) => {
+    if (!rest) return [];
+    if (depth > 6 || rest.length < 3) return null;
+    if (memo.has(rest)) return memo.get(rest);
+    let found = null;
+    for (let L = rest.length; L >= 3 && !found; L--) {
+      const head = rest.slice(0, L), tail = rest.slice(L);
+      // 그대로 / 붙으며 합쳐진 모음 되돌리기: ā=a+a, e=a+i, o=a+u (plain에서는 ā가 a)
+      const tries = [[head, tail]];
+      const last = head[head.length - 1];
+      if (last === "a") tries.push([head, "a" + tail]);
+      if (last === "e") tries.push([head.slice(0, -1) + "a", "i" + tail]);
+      if (last === "o") tries.push([head.slice(0, -1) + "a", "u" + tail], [head.slice(0, -1) + "as", tail]);
+      for (const [h, t] of tries) {
+        if (h.length < 3 || !wordAt(h)) continue;
+        if (!t) { found = [h]; break; }
+        const restSplit = go(t, depth + 1);
+        if (restSplit) { found = [h, ...restSplit]; break; }
+      }
+    }
+    memo.set(rest, found);
+    return found;
+  };
+  const parts = go(w, 0);
+  return parts && parts.length >= 2 ? parts : null;
+}
+function partLabel(p) {   // 조각을 화면용 로마자로
+  const core = CORE.find(e => e.kPlain === p);
+  if (core) return core.i;
+  const hs = DICT ? headsByPlain(p) : [];
+  return hs.length ? slpToIast(DICT.key[hs.sort((a, b) => sourceCount(b) - sourceCount(a))[0]]) : p;
 }
 const headItemLetter = h => SLP_INITIAL[DICT.key[h][0]] || "";
 
