@@ -266,7 +266,7 @@ footer p { margin: 0; }
   </div>
   <header translate="no" lang="ko">
     <h1><span class="deva">शब्दकोश</span> 산스크리트 소사전</h1>
-    <div class="head-right"><span class="count" id="count"></span><button type="button" class="btn" id="alpha-btn" aria-pressed="false">자모표</button></div>
+    <div class="head-right"><span class="count" id="count"></span><button type="button" class="btn" id="alpha-btn" aria-pressed="false">자모표 보기</button></div>
   </header>
 
   <div class="searchbar" translate="no" lang="ko">
@@ -1455,7 +1455,7 @@ function renderAlphabet() {
 function showAlphabet(on) {
   $("alphabet").hidden = !on;
   document.querySelectorAll(".dict-view").forEach(el => { el.hidden = on; });
-  $("alpha-btn").textContent = on ? "사전으로" : "자모표";
+  $("alpha-btn").textContent = on ? "사전으로" : "자모표 보기";
   $("alpha-btn").setAttribute("aria-pressed", on);
   if (on) { renderAlphabet(); $("alphabet").scrollIntoView({ block: "start" }); }
 }
