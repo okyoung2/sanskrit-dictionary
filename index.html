@@ -199,6 +199,48 @@ footer .iast-inline { font-family: var(--f-iast); }
 .orig summary { cursor: pointer; font-size: 0.85rem; color: var(--muted); }
 .orig-sub { font-size: 0.78rem; margin-left: 6px; opacity: 0.8; }
 .orig[open] summary { margin-bottom: 8px; }
+.head-right { display: flex; align-items: center; gap: 12px; }
+#alpha-btn { padding: 6px 14px; }
+#alpha-btn[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.alphabet { display: grid; gap: 26px; }
+.alpha-head { display: grid; gap: 6px; justify-content: start; }
+.alpha-head h2 { margin: 0; font-size: 1.35rem; text-wrap: balance; }
+.alpha-head h2 span { font-family: var(--f-deva); font-weight: 400; color: var(--ink); margin-left: 8px; }
+.alpha-head p, .alpha-note { margin: 0; color: var(--muted); font-size: 0.9rem; max-width: 70ch; }
+.alpha-sec { display: grid; gap: 12px; }
+.alpha-sec h3 { margin: 0; font-size: 1.1rem; }
+.alpha-sec h3 .sub, .other-group h4 .sub { font-weight: 400; color: var(--muted); font-size: 0.82rem; margin-left: 6px; }
+.akc { display: grid; gap: 4px; }
+.akc-main { display: grid; justify-items: center; gap: 1px; padding: 8px 4px 6px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); width: 100%; }
+.akc-main:hover { border-color: var(--ink); background: var(--ink-soft); }
+.akc-d { font-family: var(--f-deva); font-size: 2.2rem; line-height: 1.25; color: var(--ink); }
+.akc-i { font-family: var(--f-iast); font-size: 1.05rem; font-style: italic; }
+.akc-k { font-size: 0.85rem; }
+.akc-ipa { font-family: var(--f-iast); font-size: 0.8rem; color: var(--muted); }
+.akc-ex { border: 0; background: none; padding: 0 2px; font-size: 0.75rem; color: var(--muted); text-align: center; line-height: 1.35; min-height: 1.2em; overflow-wrap: anywhere; }
+.akc-ex:hover { color: var(--ink); text-decoration: underline; }
+.akc-ex span { font-family: var(--f-deva); font-size: 0.95rem; }
+.vowel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 12px; }
+.vowel { display: grid; gap: 6px; align-content: start; }
+.vowel-sign { display: flex; justify-content: center; align-items: baseline; gap: 8px; font-size: 0.85rem; color: var(--muted); }
+.vowel-sign span[lang] { font-family: var(--f-deva); font-size: 1.5rem; color: var(--fg); }
+.vowel-tip { margin: 0; font-size: 0.78rem; color: var(--muted); text-align: center; }
+.cons-wrap { overflow-x: auto; }
+.cons { border-collapse: separate; border-spacing: 8px; min-width: 40rem; width: 100%; margin-inline: -8px; }
+.cons th { font-weight: 400; font-size: 0.78rem; color: var(--muted); text-align: center; vertical-align: bottom; }
+.cons th b { display: block; font-size: 0.88rem; color: var(--fg); font-weight: 600; }
+.cons th span { display: block; }
+.cons th .ko { color: var(--turmeric); }
+.cons tbody th { text-align: left; vertical-align: middle; width: 7.5rem; }
+.cons td { vertical-align: top; width: 18%; }
+.others { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 18px; }
+.other-group h4 { margin: 0 0 8px; font-size: 0.95rem; }
+.other-cells { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.other { display: grid; gap: 4px; align-content: start; }
+.sign-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); gap: 10px; }
+.sign { display: grid; justify-items: center; gap: 2px; padding: 10px 6px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.sign-d { font-family: var(--f-deva); font-size: 1.9rem; line-height: 1.3; color: var(--ink); }
+@media (max-width: 480px) { .other-cells { grid-template-columns: repeat(2, minmax(0, 1fr)); } .akc-d { font-size: 1.9rem; } }
 .credit { margin: 0; color: var(--muted); font-size: 0.78rem; }
 a { color: var(--ink); }
 footer { display: grid; gap: 6px; }
@@ -215,22 +257,23 @@ footer p { margin: 0; }
   </div>
   <header translate="no" lang="ko">
     <h1><span class="deva">शब्दकोश</span> 산스크리트 소사전</h1>
-    <span class="count" id="count"></span>
+    <div class="head-right"><span class="count" id="count"></span><button type="button" class="btn" id="alpha-btn" aria-pressed="false">자모표</button></div>
   </header>
 
   <div class="searchbar" translate="no" lang="ko">
     <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="dharma · धर्म · 다르마 · 자비 · peace">
     <button class="btn btn-primary" id="search-btn" type="button">검색</button>
   </div>
-  <p class="hint" translate="no" lang="ko">데바나가리, IAST 로마자(발음 구별 기호 없이 <code>santi</code>, <code>shanti</code>, <code>krishna</code>도 됨)로 사전 표제어 21만여 개를 찾습니다. 문장 속 형태(예: <code>vidyālayasya</code>, <code>gacchati</code>)를 치면 사전 기본형을 찾아 줍니다. 한국어 낱말(예: 학교, 물, 어머니)과 영어 단어는 세 사전의 영어 뜻풀이에서도 찾습니다(<span class="src src-en">≈ 영어</span> 표시). 영어 풀이는 크롬의 <b>한국어로 번역</b>(주소창 번역 아이콘 또는 마우스 오른쪽 버튼)으로 한국어로 볼 수 있습니다.</p>
+  <p class="hint dict-view" translate="no" lang="ko">데바나가리, IAST 로마자(발음 구별 기호 없이 <code>santi</code>, <code>shanti</code>, <code>krishna</code>도 됨)로 사전 표제어 21만여 개를 찾습니다. 문장 속 형태(예: <code>vidyālayasya</code>, <code>gacchati</code>)를 치면 사전 기본형을 찾아 줍니다. 한국어 낱말(예: 학교, 물, 어머니)과 영어 단어는 세 사전의 영어 뜻풀이에서도 찾습니다(<span class="src src-en">≈ 영어</span> 표시). 영어 풀이는 크롬의 <b>한국어로 번역</b>(주소창 번역 아이콘 또는 마우스 오른쪽 버튼)으로 한국어로 볼 수 있습니다.</p>
 
-  <div class="chips" id="cats" role="group" aria-label="분류" translate="no" lang="ko"></div>
-  <nav class="varna" aria-label="첫 글자" translate="no" lang="ko"><div class="varna-row" id="varna"></div></nav>
+  <div class="chips dict-view" id="cats" role="group" aria-label="분류" translate="no" lang="ko"></div>
+  <nav class="varna dict-view" aria-label="첫 글자" translate="no" lang="ko"><div class="varna-row" id="varna"></div></nav>
 
-  <div class="main">
+  <div class="main dict-view">
     <ul class="list" id="list" aria-label="표제어 목록"></ul>
     <article class="detail" id="detail" aria-live="polite"></article>
   </div>
+  <section class="alphabet" id="alphabet" hidden translate="no" lang="ko" aria-label="데바나가리 자모표"></section>
 
   <footer translate="no" lang="ko"><p>표제어는 산스크리트 자모 순서(<span class="iast-inline">a ā i ī u ū ṛ e ai o au · k kh g gh ṅ · c ch j jh ñ · ṭ ṭh ḍ ḍh ṇ · t th d dh n · p ph b bh m · y r l v · ś ṣ s h</span>)로 정렬됩니다. 명사는 어간형으로 싣고, 주격형이 다른 경우 참고란에 적었습니다.</p>
     <p>사전 데이터: V. S. Apte, <em>The Practical Sanskrit-English Dictionary</em> (1890) · M. Monier-Williams, <em>A Sanskrit-English Dictionary</em> (1899) · F. Edgerton, <em>Buddhist Hybrid Sanskrit Dictionary</em> (1953). <a href="https://www.sanskrit-lexicon.uni-koeln.de/" target="_blank" rel="noopener">Cologne Digital Sanskrit Dictionaries</a> 디지털판, CC BY-SA 4.0. 사전 표제어의 데바나가리·한글 음역은 자동 변환했고, Apte 합성어의 표제어 형태는 연성 규칙으로 자동으로 만든 것입니다.</p></footer>
@@ -1218,6 +1261,124 @@ function writingBlock(en) {
   </details>`;
 }
 
+// ── 자모표(varṇamālā): 모음·자음을 발음 위치대로, 한글 근사음·발음 요령·예시 단어와 함께 ──
+const ALPHA_VOWELS = [   // [IAST, 독립형, 모음 기호(क 위에), 한글 근사, 요령]
+  ["a", "अ", "क", "아", "짧은 '아'. 실제로는 '어'에 가깝게 약하게"], ["ā", "आ", "का", "아—", "'아'를 두 배 길게"],
+  ["i", "इ", "कि", "이", "짧은 '이'"], ["ī", "ई", "की", "이—", "'이'를 두 배 길게"],
+  ["u", "उ", "कु", "우", "짧은 '우'"], ["ū", "ऊ", "कू", "우—", "'우'를 두 배 길게"],
+  ["ṛ", "ऋ", "कृ", "리", "모음으로 쓰는 r. '르'와 '리' 사이로 혀를 굴려서"], ["ṝ", "ॠ", "कॄ", "리—", "ṛ을 길게. 드물게 쓰임"],
+  ["ḷ", "ऌ", "कॢ", "르리", "모음으로 쓰는 l. 거의 쓰이지 않음"],
+  ["e", "ए", "के", "에—", "언제나 긴 모음"], ["ai", "ऐ", "कै", "아이", "두 모음이 이어진 소리"],
+  ["o", "ओ", "को", "오—", "언제나 긴 모음"], ["au", "औ", "कौ", "아우", "두 모음이 이어진 소리"],
+];
+const ALPHA_HEADS = [   // 다섯 줄의 칸 이름
+  ["무성음", "숨 없이 단단하게", "ㄲ·ㄸ처럼"], ["무성 유기음", "숨을 세게 내뱉으며", "ㅋ·ㅌ처럼"],
+  ["유성음", "목청을 울리며", "ㄱ·ㄷ(영어 g·d)"], ["유성 유기음", "목청을 울리고 숨을 더해", "그흐·드흐"], ["비음", "코로 울리는 소리", "ㅇ·ㄴ·ㅁ"],
+];
+const ALPHA_ROWS = [   // [줄 이름, 발음 위치, [IAST, 글자, 한글 근사] × 5]
+  ["연구개음", "혀 뒤쪽을 여린입천장에 (목구멍 쪽)",
+    [["k", "क", "까"], ["kh", "ख", "카"], ["g", "ग", "가"], ["gh", "घ", "가흐"], ["ṅ", "ङ", "응아"]]],
+  ["경구개음", "혓바닥을 단단한 입천장에",
+    [["c", "च", "짜"], ["ch", "छ", "차"], ["j", "ज", "자"], ["jh", "झ", "자흐"], ["ñ", "ञ", "냐"]]],
+  ["권설음", "혀끝을 뒤로 말아 입천장에 (점 찍힌 글자)",
+    [["ṭ", "ट", "따"], ["ṭh", "ठ", "타"], ["ḍ", "ड", "다"], ["ḍh", "ढ", "다흐"], ["ṇ", "ण", "나"]]],
+  ["치음", "혀끝을 윗니 뒤에",
+    [["t", "त", "따"], ["th", "थ", "타"], ["d", "द", "다"], ["dh", "ध", "다흐"], ["n", "न", "나"]]],
+  ["순음", "두 입술로",
+    [["p", "प", "빠"], ["ph", "फ", "파"], ["b", "ब", "바"], ["bh", "भ", "바흐"], ["m", "म", "마"]]],
+];
+const ALPHA_OTHERS = [   // [묶음 이름, 설명, [IAST, 글자, 한글 근사, 요령]]
+  ["반모음", "모음과 자음의 중간 소리", [
+    ["y", "य", "야", "'이'를 짧게 붙여서"], ["r", "र", "라", "혀끝을 한 번 굴려서"],
+    ["l", "ल", "라", "혀끝을 윗니 뒤에 대고"], ["v", "व", "바", "영어 v와 w 사이, 입술을 살짝 대고"]]],
+  ["마찰음과 h", "숨을 갈아 내는 소리", [
+    ["ś", "श", "샤", "부드러운 '시' 소리(경구개)"], ["ṣ", "ष", "샤", "혀끝을 뒤로 말고 '샤'(권설)"],
+    ["s", "स", "사", "보통 'ㅅ'"], ["h", "ह", "하", "목청을 울리는 'ㅎ'"]]],
+];
+const ALPHA_SIGNS = [   // 기호와 자주 보는 합자
+  ["ṃ", "ं", "अं", "ㅇ·ㅁ 받침", "아누스바라: 앞 모음을 콧소리로 끝냄"],
+  ["ḥ", "ः", "अः", "아하", "비사르가: 앞 모음을 숨소리로 살짝 되풀이"],
+  ["m̐", "ँ", "अँ", "콧소리", "찬드라빈두: 모음 전체를 콧소리로"],
+  ["", "्", "क्", "끄(모음 없음)", "비라마: 글자 끝의 모음 a를 없앰"],
+  ["’", "ऽ", "सोऽहम्", "(소리 없음)", "아바그라하: 연성으로 빠진 a 자리 표시"],
+  ["oṃ", "ॐ", "ॐ", "옴", "성음(聖音) 옴을 한 글자로"],
+  ["kṣa", "क्ष", "क्ष", "크샤", "k + ṣ 합자"], ["jña", "ज्ञ", "ज्ञ", "그냐/즈냐", "j + ñ 합자 (prajñā의 jñā)"],
+  ["tra", "त्र", "त्र", "트라", "t + r 합자 (mantra의 tra)"], ["śra", "श्र", "श्र", "슈라", "ś + r 합자 (śrī의 śr)"],
+];
+const EX_PRIORITY = ["basic", "num", "god", "yoga", "bud", "spirit", "ayur", "phil", "lang", "root"];
+function exampleFor(token) {
+  const c = CORE.filter(e => e.t[0] === token && !e.i.includes(" "));
+  c.sort((a, b) => EX_PRIORITY.indexOf(a.c) - EX_PRIORITY.indexOf(b.c) || a.i.length - b.i.length);
+  return c[0];
+}
+function alphaCell(iast, deva, ko, tip, speakText) {
+  const ex = iast ? exampleFor(iast.replace(/a$/, "") || iast) : null;
+  return `<div class="akc">
+    <button type="button" class="akc-main" data-speak="${speakText || deva}" title="${esc(tip || "")}">
+      <span class="akc-d" lang="sa">${deva}</span>
+      <span class="akc-i">${esc(iast)}</span>
+      <span class="akc-k">${esc(ko)}</span>
+      ${IPA[iast] ? `<span class="akc-ipa">[${IPA[iast]}]</span>` : ""}
+    </button>
+    ${ex ? `<button type="button" class="akc-ex" data-goto="${ex.key}"><span lang="sa">${ex.d}</span> ${esc(ex.i)} · ${esc(ex.k.split(/[,;(]/)[0].trim())}</button>` : `<span class="akc-ex empty"></span>`}
+  </div>`;
+}
+let alphaDone = false;
+function renderAlphabet() {
+  if (alphaDone) return;
+  alphaDone = true;
+  $("alphabet").innerHTML = `
+    <header class="alpha-head">
+      <h2>데바나가리 자모표 <span lang="sa">वर्णमाला</span></h2>
+      <p>산스크리트 자모는 발음하는 위치에 따라 줄을 맞춰 늘어놓습니다(varṇamālā). 글자를 누르면 소리를 들을 수 있고${speechReady ? "" : "(이 기기에 힌디어 음성이 있을 때)"}, 아래 예시 단어를 누르면 사전으로 갑니다. 한글은 비슷한 소리일 뿐이니 발음기호와 요령을 함께 보세요.</p>
+    </header>
+
+    <section class="alpha-sec">
+      <h3>모음 <span class="sub">스바라 svara · 13자</span></h3>
+      <p class="alpha-note">단어 첫머리에는 왼쪽의 독립 글자를, 자음 뒤에서는 오른쪽처럼 기호를 붙여 씁니다(예: क ka에 붙인 모양). 짧은 모음 a는 자음에 이미 들어 있어서 기호가 없습니다.</p>
+      <div class="vowel-grid">${ALPHA_VOWELS.map(([i, d, sign, ko, tip]) => `
+        <div class="vowel">
+          ${alphaCell(i, d, ko, tip)}
+          <div class="vowel-sign"><span lang="sa">${sign}</span><span>k${esc(i)}</span></div>
+          <p class="vowel-tip">${esc(tip)}</p>
+        </div>`).join("")}
+      </div>
+    </section>
+
+    <section class="alpha-sec">
+      <h3>자음 <span class="sub">바르가 varga · 다섯 줄 × 다섯 칸</span></h3>
+      <p class="alpha-note">모든 자음에는 짧은 모음 a가 붙어 있어 क는 'ka'로 읽습니다. 가로로는 숨과 목청의 울림이, 세로로는 혀와 입술의 위치가 같습니다.</p>
+      <div class="cons-wrap"><table class="cons">
+        <thead><tr><th></th>${ALPHA_HEADS.map(([n, how, ko]) => `<th><b>${n}</b><span>${how}</span><span class="ko">${ko}</span></th>`).join("")}</tr></thead>
+        <tbody>${ALPHA_ROWS.map(([name, where, cells]) => `<tr><th scope="row"><b>${name}</b><span>${where}</span></th>${cells.map(([i, d, ko]) => `<td>${alphaCell(i, d, ko + " (" + i + "a)")}</td>`).join("")}</tr>`).join("")}</tbody>
+      </table></div>
+      <div class="others">${ALPHA_OTHERS.map(([name, desc, cells]) => `
+        <div class="other-group"><h4>${name} <span class="sub">${desc}</span></h4>
+          <div class="other-cells">${cells.map(([i, d, ko, tip]) => `<div class="other">${alphaCell(i, d, ko + " (" + i + "a)", tip)}<p class="vowel-tip">${esc(tip)}</p></div>`).join("")}</div>
+        </div>`).join("")}
+      </div>
+    </section>
+
+    <section class="alpha-sec">
+      <h3>기호와 자주 보는 합자</h3>
+      <div class="sign-grid">${ALPHA_SIGNS.map(([i, sign, sample, ko, tip]) => `
+        <div class="sign">
+          <span class="sign-d" lang="sa">${sample}</span>
+          <span class="akc-i">${esc(i || "—")}</span>
+          <span class="akc-k">${esc(ko)}</span>
+          <p class="vowel-tip">${esc(tip)}</p>
+        </div>`).join("")}
+      </div>
+    </section>`;
+}
+function showAlphabet(on) {
+  $("alphabet").hidden = !on;
+  document.querySelectorAll(".dict-view").forEach(el => { el.hidden = on; });
+  $("alpha-btn").textContent = on ? "사전으로" : "자모표";
+  $("alpha-btn").setAttribute("aria-pressed", on);
+  if (on) { renderAlphabet(); $("alphabet").scrollIntoView({ block: "start" }); }
+}
+
 // 핵심 어휘(한국어 풀이)
 const CORE = RAW.trim().split("\n").map((line, id) => {
   const [d, i, h, p, k, e, c, x] = line.split("|");
@@ -2009,6 +2170,7 @@ function goTo(key) {
 let typing;
 $("q").addEventListener("input", e => {
   clearTimeout(typing);
+  if (!$("alphabet").hidden) showAlphabet(false);
   typing = setTimeout(() => { state.q = e.target.value; state.sel = null; state.limit = PAGE_LIMIT; render(); }, 150);
 });
 // 분류·첫 글자 버튼은 '둘러보기'라서 검색어를 지우고 그 분류 전체를 보여 줌
@@ -2052,11 +2214,19 @@ $("detail").addEventListener("click", e => {
 // 검색 버튼·엔터: 입력한 단어로 바로 찾고 첫 결과를 엶(분류·첫 글자 선택은 풀어서 전체에서 찾음)
 function runSearch() {
   clearTimeout(typing);
+  if (!$("alphabet").hidden) showAlphabet(false);
   state.q = $("q").value; state.cat = "all"; state.letter = ""; state.limit = PAGE_LIMIT; state.sel = null;
   renderVarna(); lastSel = null; render(); scrollToCurrent();
   if (matchMedia("(max-width: 760px)").matches) $("list").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 $("search-btn").addEventListener("click", runSearch);
+$("alpha-btn").addEventListener("click", () => showAlphabet($("alphabet").hidden));
+$("alphabet").addEventListener("click", e => {
+  const g = e.target.closest("[data-goto]");
+  if (g) { showAlphabet(false); goTo(g.dataset.goto); return; }
+  const sp = e.target.closest("[data-speak]");
+  if (sp) speak(sp.dataset.speak);
+});
 // 한글 입력 중 엔터는 마지막 글자가 조합 중일 수 있어서, 입력이 확정된 뒤 찾도록 살짝 늦춤
 $("q").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); setTimeout(runSearch, 0); } });
 
@@ -2066,6 +2236,7 @@ if (/KAKAOTALK/i.test(navigator.userAgent)) {
 }
 renderCats(); renderVarna();
 state.sel = CORE.find(e => e.i === "dharma").key;
+if (location.hash === "#alphabet") setTimeout(() => showAlphabet(true), 0);
 render(); scrollToCurrent();
 loadDict().then(() => { renderCats(); renderVarna(); lastSel = null; render(); });
 </script>
