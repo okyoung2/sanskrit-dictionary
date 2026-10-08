@@ -167,6 +167,8 @@ footer .iast-inline { font-family: var(--f-iast); }
 .chip-sep { width: 1px; align-self: stretch; background: var(--line); margin-inline: 4px; }
 .chip-dict { border-style: dashed; }
 .chip-dict[aria-pressed="true"] { border-style: solid; }
+.item .src-lemma { color: var(--ink); border-color: var(--ink); border-style: dashed; }
+.lemma-note { margin: 0; padding: 10px 14px; border-radius: 6px; background: var(--ink-soft); font-size: 0.9rem; }
 .item .src-en { color: var(--turmeric); border-color: var(--turmeric); border-style: dashed; }
 .item .src-ko { color: var(--ink); border-color: var(--ink); }
 .src-tabs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid var(--line); }
@@ -218,7 +220,7 @@ footer p { margin: 0; }
     <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="dharma · धर्म · 다르마 · 자비 · peace">
     <button class="btn" id="random" type="button">아무 단어</button>
   </div>
-  <p class="hint" translate="no" lang="ko">데바나가리, IAST 로마자(발음 구별 기호 없이 <code>santi</code>, <code>shanti</code>, <code>krishna</code>도 됨)로 사전 표제어 21만여 개를 찾습니다. 한국어 낱말(예: 학교, 물, 어머니)과 영어 단어는 세 사전의 영어 뜻풀이에서도 찾습니다(<span class="src src-en">≈ 영어</span> 표시). 영어 풀이는 크롬의 <b>한국어로 번역</b>(주소창 번역 아이콘 또는 마우스 오른쪽 버튼)으로 한국어로 볼 수 있습니다.</p>
+  <p class="hint" translate="no" lang="ko">데바나가리, IAST 로마자(발음 구별 기호 없이 <code>santi</code>, <code>shanti</code>, <code>krishna</code>도 됨)로 사전 표제어 21만여 개를 찾습니다. 문장 속 형태(예: <code>vidyālayasya</code>, <code>gacchati</code>)를 치면 사전 기본형을 찾아 줍니다. 한국어 낱말(예: 학교, 물, 어머니)과 영어 단어는 세 사전의 영어 뜻풀이에서도 찾습니다(<span class="src src-en">≈ 영어</span> 표시). 영어 풀이는 크롬의 <b>한국어로 번역</b>(주소창 번역 아이콘 또는 마우스 오른쪽 버튼)으로 한국어로 볼 수 있습니다.</p>
 
   <div class="chips" id="cats" role="group" aria-label="분류" translate="no" lang="ko"></div>
   <nav class="varna" aria-label="첫 글자" translate="no" lang="ko"><div class="varna-row" id="varna"></div></nav>
@@ -1412,6 +1414,102 @@ function englishHits(words, mode) {   // mode "any"(한국어 동의어 합치�
   }
   return best || new Map();
 }
+// ── 활용형 검색: 문장 속 형태(vidyālayasya, gacchati)에서 어미를 떼어 사전 기본형을 찾음 ──
+// 규칙은 발음 구별 기호를 뺀 로마자(plain)로 씀: [어미, 바꿀 끝, 설명]
+const NOUN_RULES = [
+  // a로 끝나는 남성·중성 (deva, jñāna)
+  ["asya", "a", "속격 단수 (~의)"], ["ena", "a", "구격 단수 (~로)"], ["aya", "a", "여격 단수 (~에게) · 여성 구격 단수"],
+  ["at", "a", "탈격 단수 (~에서부터)"], ["e", "a", "처격 단수 (~에서) · 여성 양수"], ["au", "a", "양수 주격·대격"],
+  ["abhyam", "a", "양수 구격·여격·탈격"], ["ayoh", "a", "양수 속격·처격"], ["ah", "a", "주격 단수 · 복수 주격"],
+  ["am", "a", "대격 단수 · 중성 주격 단수"], ["an", "a", "복수 대격"], ["ani", "a", "중성 복수 주격·대격"],
+  ["aih", "a", "복수 구격 (~들로)"], ["ebhyah", "a", "복수 여격·탈격"], ["anam", "a", "복수 속격 (~들의)"], ["esu", "a", "복수 처격 (~들 속에서)"],
+  // ā로 끝나는 여성 (vidyā)
+  ["ayai", "a", "여성 여격 단수"], ["ayah", "a", "여성 탈격·속격 단수"], ["ayam", "a", "여성 처격 단수"],
+  ["abhih", "a", "여성 복수 구격"], ["abhyah", "a", "여성 복수 여격·탈격"], ["asu", "a", "여성 복수 처격"],
+  // i로 끝나는 말 (agni, śānti)
+  ["ih", "i", "주격 단수"], ["im", "i", "대격 단수"], ["ina", "i", "구격 단수"], ["aye", "i", "여격 단수"], ["eh", "i", "탈격·속격 단수"],
+  ["ayah", "i", "복수 주격"], ["in", "i", "복수 대격"], ["ibhih", "i", "복수 구격"], ["inam", "i", "복수 속격"], ["isu", "i", "복수 처격"],
+  ["ya", "i", "여성 구격 단수"], ["yai", "i", "여성 여격 단수"], ["yah", "i", "여성 탈격·속격 단수"], ["yam", "i", "여성 처격 단수"],
+  // u로 끝나는 말 (guru, bhikṣu)
+  ["uh", "u", "주격 단수"], ["um", "u", "대격 단수"], ["una", "u", "구격 단수"], ["ave", "u", "여격 단수"], ["oh", "u", "탈격·속격 단수"],
+  ["avah", "u", "복수 주격"], ["un", "u", "복수 대격"], ["ubhih", "u", "복수 구격"], ["unam", "u", "복수 속격"], ["usu", "u", "복수 처격"], ["uni", "u", "중성 복수"],
+  // ṛ로 끝나는 말 (pitṛ, mātṛ)
+  ["ta", "tr", "주격 단수 (pitā → pitṛ, kartā → kartṛ)"], ["aram", "r", "대격 단수"], ["ra", "r", "구격 단수"], ["re", "r", "여격 단수"],
+  ["uh", "r", "탈격·속격 단수"], ["ari", "r", "처격 단수"], ["arau", "r", "양수"], ["arah", "r", "복수 주격"], ["rnam", "r", "복수 속격"],
+  // an으로 끝나는 말 (rājan, ātman, karman, nāman)
+  ["a", "an", "주격 단수 (rājā → rājan, karma → karman)"], ["anam", "an", "대격 단수"], ["ana", "an", "구격 단수"], ["na", "an", "구격 단수"],
+  ["ane", "an", "여격 단수"], ["ne", "an", "여격 단수"], ["anah", "an", "속격 단수 · 복수 주격"], ["nah", "an", "속격 단수"],
+  ["ani", "an", "처격 단수"], ["ni", "an", "처격 단수"], ["anau", "an", "양수"], ["abhih", "an", "복수 구격"], ["nam", "an", "복수 속격"],
+  // in으로 끝나는 말 (yogin, svāmin)
+  ["i", "in", "주격 단수 (yogī → yogin)"], ["inam", "in", "대격 단수"], ["ina", "in", "구격 단수"], ["ine", "in", "여격 단수"],
+  ["inah", "in", "속격 단수 · 복수 주격"], ["ini", "in", "처격 단수"], ["inau", "in", "양수"],
+  // as로 끝나는 중성 (manas, tapas)
+  ["ah", "as", "주격 단수 (manaḥ → manas)"], ["asa", "as", "구격 단수"], ["ase", "as", "여격 단수"], ["asah", "as", "속격 단수"],
+  ["asi", "as", "처격 단수"], ["amsi", "as", "복수 주격·대격"], ["obhih", "as", "복수 구격"], ["o", "as", "연성형 (mano → manas)"],
+  // at·vat·mat (bhagavat, mahat)
+  ["an", "at", "주격 단수 (bhagavān → bhagavat)"], ["antam", "at", "대격 단수"], ["ata", "at", "구격 단수"], ["atah", "at", "속격 단수"],
+  ["a", "at", "합성어 앞 형태 (mahā → mahat)"],
+];
+const VERB_RULES = [
+  ["ati", "현재 3인칭 단수 (그가 ~한다)"], ["oti", "현재 3인칭 단수 (그가 ~한다)"], ["noti", "현재 3인칭 단수 (그가 ~한다)"],
+  ["vanti", "현재 3인칭 복수 (그들이 ~한다)"], ["nvanti", "현재 3인칭 복수 (그들이 ~한다)"], ["ati", "현재 3인칭 단수 (그가 ~한다)"], ["anti", "현재 3인칭 복수 (그들이 ~한다)"], ["asi", "현재 2인칭 단수 (너는 ~한다)"],
+  ["ami", "현재 1인칭 단수 (나는 ~한다)"], ["amah", "현재 1인칭 복수 (우리는 ~한다)"], ["atha", "현재 2인칭 복수"],
+  ["ate", "현재 3인칭 단수 (중간태)"], ["ante", "현재 3인칭 복수 (중간태)"], ["e", "현재 1인칭 단수 (중간태)"],
+  ["atu", "명령 3인칭 단수 (~하라)"], ["antu", "명령 3인칭 복수"], ["a", "명령 2인칭 단수 (~해라)"],
+  ["et", "원망 3인칭 단수 (~하기를)"], ["eyuh", "원망 3인칭 복수"], ["at", "과거(미완료) 3인칭 단수 · 현재분사"],
+  ["isyati", "미래 3인칭 단수 (~할 것이다)"], ["syati", "미래 3인칭 단수 (~할 것이다)"], ["isyanti", "미래 3인칭 복수"], ["syanti", "미래 3인칭 복수"],
+  ["itva", "절대분사 (~하고 나서)"], ["tva", "절대분사 (~하고 나서)"], ["ya", "절대분사 (접두사 붙은 동사, ~하고 나서)"],
+  ["itum", "부정사 (~하기 위해)"], ["tum", "부정사 (~하기 위해)"], ["amana", "현재분사 (중간태, ~하는)"], ["ant", "현재분사 (~하는)"],
+];
+// 현재 어간이 어근과 많이 다른 동사(산스크리트 문법서의 대표 불규칙 어간)
+const IRREG_STEM = {
+  gacch: ["gam"], yacch: ["yam"], pasy: ["drs"], tisth: ["stha"], pib: ["pa"], jighr: ["ghra"], sid: ["sad"],
+  kar: ["kr"], kur: ["kr"], karo: ["kr"], dad: ["da"], dada: ["da"], dadh: ["dha"], dadha: ["dha"], jan: ["jna", "jan"],
+  jana: ["jna"], srno: ["sru"], srnv: ["sru"], srnu: ["sru"], icch: ["is"], prcch: ["prach", "prcch"], bhav: ["bhu"],
+  jay: ["ji"], nay: ["ni"], smar: ["smr"], bodh: ["budh"], budhy: ["budh"], many: ["man"], dhar: ["dhr"], har: ["hr"],
+  tar: ["tr"], mriy: ["mr"], kurv: ["kr"], kuru: ["kr"], sr: ["sru"], srn: ["sru"], apn: ["ap"], ap: ["ap"], ved: ["vid"], vett: ["vid"], asn: ["as"], apno: ["ap"], apnu: ["ap"],
+};
+const AS_FORMS = { asti: "현재 3인칭 단수 (그는 ~이다)", santi: "현재 3인칭 복수 (그들은 ~이다)", asi: "현재 2인칭 단수", asmi: "현재 1인칭 단수 (나는 ~이다)", smah: "현재 1인칭 복수", asit: "과거 3인칭 단수 (~였다)" };
+function verbRoots(stem) {   // → Map(어근 후보 → 불규칙 표에서 왔는지)
+  const irregular = new Set();
+  for (const [k, v] of Object.entries(IRREG_STEM)) if (stem.endsWith(k)) v.forEach(r => irregular.add(stem.slice(0, -k.length) + r));
+  const out = new Set([stem]);
+  if (stem.endsWith("ay") && stem.length > 3) out.add(stem.slice(0, -2));        // 10류 cintay → cint
+  if (stem.endsWith("y") && stem.length > 2) out.add(stem.slice(0, -1));          // 4류·수동 nṛtya → nṛt
+  for (const s of [...out]) {                                                      // 구나 되돌리기: bhav → bhū, smar → smṛ
+    out.add(s.replace(/av$/, "u")).add(s.replace(/ay$/, "i")).add(s.replace(/ar$/, "r"));
+    out.add(s.replace(/o([^aeiou]*)$/, "u$1")).add(s.replace(/e([^aeiou]*)$/, "i$1"));
+  }
+  if (/^[^aeiou]*a$/.test(stem)) { out.add(stem + "m"); out.add(stem + "n"); }   // ga-tvā → gam, ha-tvā → han
+  const res = new Map();
+  irregular.forEach(r => res.set(r, true));
+  out.forEach(r => { if (!res.has(r)) res.set(r, false); });
+  return res;
+}
+function lemmaCandidates(w) {   // w: plain 키 → Map(기본형 후보 → [설명, 우선순위(작을수록 앞)])
+  const out = new Map();
+  const add = (cand, label, prio) => {
+    if (cand.length < 2 || cand === w) return;
+    if (!out.has(cand) || out.get(cand)[1] > prio) out.set(cand, [label, prio]);
+  };
+  if (AS_FORMS[w]) add("as", AS_FORMS[w], 0);
+  for (const [end, rep, label] of NOUN_RULES)
+    if (w.endsWith(end) && w.length > end.length + 1) add(w.slice(0, -end.length) + rep, label, 10 - end.length);
+  for (const [end, label] of VERB_RULES)
+    if (w.endsWith(end) && w.length > end.length + 1)
+      for (const [r, irregular] of verbRoots(w.slice(0, -end.length))) add(r, label, irregular ? 0 : 10 - end.length);
+  return out;
+}
+function headsByPlain(p) {
+  const { byPlain, plainK } = DICT;
+  let lo = 0, hi = byPlain.length;
+  while (lo < hi) { const mid = (lo + hi) >> 1; if (plainK[byPlain[mid]] < p) lo = mid + 1; else hi = mid; }
+  const out = [];
+  for (let n = lo; n < byPlain.length && plainK[byPlain[n]] === p; n++) out.push(byPlain[n]);
+  return out;
+}
+const LEMMA = new Map();   // 항목 키 → 활용형 설명
+
 function catAllowsCore(cat) { return cat === "all" || !(cat in DICT_CAT); }
 function catMask(cat) { return cat === "all" ? 0xff : DICT_CAT[cat] || 0; }
 
@@ -1433,6 +1531,20 @@ function filtered() {
           res.push([exact ? 100 : 80, 1 + DICT.plainK[h].length, h]);
         }
       }
+    }
+    LEMMA.clear();
+    if (!Q.isHangul && Q.variants.length) {
+      const cands = [...lemmaCandidates(Q.variants[0])].sort((a, b) => a[1][1] - b[1][1]);
+      const have = new Set(res.filter(r => r[0] >= 100).map(r => typeof r[2] === "number" ? "h" + r[2] : r[2].key));
+      cands.forEach(([cand, [label]], rank) => {
+        for (const en of coreList) if (en.kPlain === cand && !have.has(en.key)) { res.push([90, rank, en]); have.add(en.key); LEMMA.set(en.key, label); }
+        if (DICT && mask) for (const h of headsByPlain(cand)) {
+          if (have.has("h" + h) || !(DICT.mask[h] & mask)) continue;
+          res.push([90, 10 + rank * 10 - sourceCount(h), h]); have.add("h" + h); LEMMA.set("h" + h, label);
+        }
+      });
+      // 활용형 후보로 다시 잡힌 항목은 접두어 결과(80점)에서 빼서 두 번 나오지 않게
+      for (let n = res.length - 1; n >= 0; n--) if (res[n][0] === 80 && typeof res[n][2] === "number" && LEMMA.has("h" + res[n][2])) res.splice(n, 1);
     }
     // 뜻으로 찾기: 한국어는 낱말표로 영어로 바꾼 뒤, 영어는 그대로 세 사전의 영어 뜻 색인에서
     VIA.clear();
@@ -1519,7 +1631,7 @@ function renderList({ total, items }) {
     let gloss = en.k;
     if (en.src === "dict") { const m = metaNow(en.h); gloss = m ? m[0] : ""; if (!m) need.add(en.h); }
     return `<li><button type="button" class="item" data-key="${en.key}" aria-current="${state.sel === en.key}">
-      <span class="d" translate="no">${en.d}</span><span class="i" translate="no">${esc(en.iDisp || en.i)}${BADGE(en)}${en.src === "dict" && VIA.has(en.h) ? `<span class="src src-en" title="영어 뜻풀이에서 찾음">≈ ${esc(VIA.get(en.h))}</span>` : ""}</span>
+      <span class="d" translate="no">${en.d}</span><span class="i" translate="no">${esc(en.iDisp || en.i)}${BADGE(en)}${LEMMA.has(en.key) ? `<span class="src src-lemma" title="${esc(LEMMA.get(en.key))}">← ${esc(LEMMA.get(en.key).replace(/ \([^)]*\)/g, ""))}</span>` : ""}${en.src === "dict" && VIA.has(en.h) ? `<span class="src src-en" title="영어 뜻풀이에서 찾음">≈ ${esc(VIA.get(en.h))}</span>` : ""}</span>
       <span class="k"${en.src === "dict" ? ` data-h="${en.h}" lang="en"` : ' translate="no"'}>${esc(gloss || "")}</span></button></li>`;
   }).join("") + (total > items.length
     ? `<li class="more"><button type="button" class="btn" id="more">${items.length.toLocaleString()} / ${total.toLocaleString()}개 표시 중 · 더 보기</button></li>` : "");
@@ -1786,6 +1898,8 @@ function renderDetail() {
   if (!en) { $("detail").innerHTML = `<p class="empty">목록에서 단어를 고르세요.</p>`; return; }
   if (en.src === "core") { coreDetail(en); $("detail").setAttribute("translate", "no"); }
   else { headDetail(en); $("detail").removeAttribute("translate"); }
+  if (LEMMA.has(en.key)) $("detail").insertAdjacentHTML("afterbegin",
+    `<p class="lemma-note" translate="no">검색한 <b>${esc(state.q.trim())}</b>은(는) 이 단어의 <b>${esc(LEMMA.get(en.key))}</b> 형태로 보입니다. 어미 규칙으로 자동 분석한 결과라 틀릴 수 있어요.</p>`);
   protect($("detail"));
   $("copy").onclick = () => {
     const gloss = en.src === "core" ? en.k : (metaNow(en.h)?.[0] || "");
