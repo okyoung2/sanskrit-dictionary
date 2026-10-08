@@ -1969,14 +1969,18 @@ $("q").addEventListener("input", e => {
   clearTimeout(typing);
   typing = setTimeout(() => { state.q = e.target.value; state.sel = null; state.limit = PAGE_LIMIT; render(); }, 150);
 });
+// 분류·첫 글자 버튼은 '둘러보기'라서 검색어를 지우고 그 분류 전체를 보여 줌
+function clearQuery() { clearTimeout(typing); state.q = ""; $("q").value = ""; state.autoSel = false; }
 $("cats").addEventListener("click", e => {
   const b = e.target.closest(".chip"); if (!b) return;
+  clearQuery();
   state.cat = b.dataset.cat; state.letter = ""; state.sel = null; state.limit = PAGE_LIMIT;
   renderVarna(); render();
 });
 $("varna").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   const l = b.dataset.letter;
+  clearQuery();
   state.letter = !l || state.letter === l ? "" : l; state.sel = null; state.limit = PAGE_LIMIT; render();
 });
 $("list").addEventListener("click", e => {
