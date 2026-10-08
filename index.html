@@ -408,7 +408,7 @@ const RAW = `
 शील|śīla|실라|n.|계(戒), 도덕적 행위|morality, precepts|bud|
 पारमिता|pāramitā|파라미타|f.|바라밀(波羅蜜), 완성|perfection|bud|
 सूत्र|sūtra|수트라|n.|실; 경(經); 짧은 금언|thread; scripture; aphorism|bud|
-मन्त्र|mantra|만트라|m.|진언(眞言), 주문|sacred formula|bud|
+मन्त्र|mantra|만트라|m.|진언(眞言), 주문|sacred formula|mantra|
 अनित्य|anitya|아니티야|adj.|무상(無常)한|impermanent|bud|
 अनात्मन्|anātman|아나트만|m.|무아(無我)|non-self|bud|
 तृष्णा|tṛṣṇā|트리슈나|f.|갈애(渴愛), 목마름|craving, thirst|bud|
@@ -678,7 +678,7 @@ const RAW = `
 गाथा|gāthā|가타|f.|게송(偈頌), 시구|verse|bud|
 धारणी|dhāraṇī|다라니|f.|다라니(陀羅尼), 총지(總持)|mnemonic incantation|bud|
 अभिषेक|abhiṣeka|아비셰카|m.|관정(灌頂), 즉위·입문의 물 뿌림|consecration|bud|
-स्वाहा|svāhā|스바하|ind.|사바하, 원만히 이루어지소서|hail, so be it|bud|진언 끝에 붙는 말
+स्वाहा|svāhā|스바하|ind.|사바하, 원만히 이루어지소서|hail, so be it|mantra|진언 끝에 붙는 말
 बीज|bīja|비자|n.|씨앗, 종자; 종자 진언|seed; seed syllable|bud|
 उपासक|upāsaka|우파사카|m.|우바새(優婆塞), 남자 재가 신자|lay follower (male)|bud|
 उपासिका|upāsikā|우파시카|f.|우바이(優婆夷), 여자 재가 신자|lay follower (female)|bud|
@@ -725,8 +725,8 @@ const RAW = `
 पुण्डरीक|puṇḍarīka|푼다리카|n.|흰 연꽃|white lotus|bud|
 उत्पल|utpala|우트팔라|n.|푸른 연꽃|blue lotus|bud|
 मणि|maṇi|마니|m.|보주(寶珠), 보석|jewel|bud|
-ॐ मणिपद्मे हूँ|oṃ maṇipadme hūṃ|옴 마니 파드메 훔|ind.|옴 마니 반메 훔, 관세음보살 육자진언|Om, jewel in the lotus, hūṃ|bud|
-गते गते पारगते पारसंगते बोधि स्वाहा|gate gate pāragate pārasaṃgate bodhi svāhā|가테 가테 파라가테 파라상가테 보디 스바하|ind.|아제아제 바라아제 바라승아제 모지 사바하|gone, gone, gone beyond, gone altogether beyond, awakening, hail|bud|『반야심경』의 진언
+ॐ मणिपद्मे हूँ|oṃ maṇipadme hūṃ|옴 마니 파드메 훔|ind.|옴 마니 반메 훔, 관세음보살 육자진언|Om, jewel in the lotus, hūṃ|mantra|
+गते गते पारगते पारसंगते बोधि स्वाहा|gate gate pāragate pārasaṃgate bodhi svāhā|가테 가테 파라가테 파라상가테 보디 스바하|ind.|아제아제 바라아제 바라승아제 모지 사바하|gone, gone, gone beyond, gone altogether beyond, awakening, hail|mantra|『반야심경』의 진언
 तन्त्र|tantra|탄트라|n.|베틀; 체계; 탄트라 경전|loom; system; tantra|bud|
 आध्यात्मिक|ādhyātmika|아디야트미카|adj.|영적인, 내면의 자아에 관한|spiritual|spirit|
 अध्यात्म|adhyātma|아디야트마|n.|최고의 자아, 영성|the supreme self|spirit|
@@ -989,10 +989,70 @@ const RAW = `
 द्वय|dvaya|드바야|n.|쌍, 둘|pair, couple|num|
 संख्या|saṃkhyā|상키야|f.|수, 셈|number, count|num|상키야 철학(sāṃkhya)과 같은 어근
 गणित|gaṇita|가니타|n.|셈, 수학|calculation, mathematics|num|
+नमः|namaḥ|나마하|ind.|경배합니다, 귀의합니다|homage, salutation|mantra|namas의 연성형. 만트라 끝에 '~께 경배'로 붙음
+नमो|namo|나모|ind.|경배합니다, 귀의합니다|homage, salutation|mantra|namas의 연성형(유성음 앞). '나무아미타불'의 '나무'
+ॐ नमः शिवाय|oṃ namaḥ śivāya|옴 나마하 시바야|ind.|시바께 귀의합니다 (다섯 음절 진언)|Om, homage to Śiva|mantra|na-maḥ-śi-vā-ya 다섯 음절이라 판차크샤라(pañcākṣara)라 부름
+ॐ नमो नारायणाय|oṃ namo nārāyaṇāya|옴 나모 나라야나야|ind.|나라야나(비슈누)께 귀의합니다 (여덟 음절 진언)|Om, homage to Nārāyaṇa|mantra|
+ॐ नमो भगवते वासुदेवाय|oṃ namo bhagavate vāsudevāya|옴 나모 바가바테 바수데바야|ind.|존귀한 바수데바(크리슈나)께 귀의합니다 (열두 음절 진언)|Om, homage to the Lord Vāsudeva|mantra|
+ॐ गं गणपतये नमः|oṃ gaṃ gaṇapataye namaḥ|옴 감 가나파타예 나마하|ind.|가나파티(가네샤)께 경배합니다|Om gaṃ, homage to Gaṇapati|mantra|gaṃ은 가네샤의 종자 음절
+ॐ श्री गणेशाय नमः|oṃ śrī gaṇeśāya namaḥ|옴 슈리 가네샤야 나마하|ind.|거룩한 가네샤께 경배합니다|Om, homage to Śrī Gaṇeśa|mantra|일을 시작할 때 장애를 없애 달라며 외움
+ॐ शरवणभव|oṃ śaravaṇabhava|옴 샤라바나바바|ind.|갈대숲에서 태어나신 분(무루간)이시여|Om, born in the reed forest (Murugan)|mantra|무루간(스칸다)의 여섯 음절 진언. 타밀어로 '옴 사라바나바바'
+ॐ ऐं सरस्वत्यै नमः|oṃ aiṃ sarasvatyai namaḥ|옴 아임 사라스바티야이 나마하|ind.|사라스바티(학문의 여신)께 경배합니다|Om aiṃ, homage to Sarasvatī|mantra|aiṃ은 사라스바티의 종자 음절
+ॐ श्रीं महालक्ष्म्यै नमः|oṃ śrīṃ mahālakṣmyai namaḥ|옴 슈림 마하락슈미야이 나마하|ind.|위대한 락슈미(행운의 여신)께 경배합니다|Om śrīṃ, homage to Mahālakṣmī|mantra|śrīṃ은 락슈미의 종자 음절
+ॐ दुं दुर्गायै नमः|oṃ duṃ durgāyai namaḥ|옴 둠 두르가야이 나마하|ind.|두르가 여신께 경배합니다|Om duṃ, homage to Durgā|mantra|
+ॐ हं हनुमते नमः|oṃ haṃ hanumate namaḥ|옴 함 하누마테 나마하|ind.|하누만께 경배합니다|Om haṃ, homage to Hanumān|mantra|
+ॐ सूर्याय नमः|oṃ sūryāya namaḥ|옴 수리야야 나마하|ind.|태양신께 경배합니다|Om, homage to the Sun|mantra|태양 경배 자세에서 외우는 열두 이름 중 하나
+ॐ भूर्भुवः स्वः तत्सवितुर्वरेण्यं भर्गो देवस्य धीमहि धियो यो नः प्रचोदयात्|oṃ bhūr bhuvaḥ svaḥ tat savitur vareṇyaṃ bhargo devasya dhīmahi dhiyo yo naḥ pracodayāt|옴 부르 부바하 스바하 타트 사비투르 바레니얌 바르고 데바스야 디마히 디요 요 나하 프라초다야트|ind.|가야트리 만트라: 땅·하늘·천계여, 사비트리 신의 거룩한 빛을 명상하니, 그가 우리의 지혜를 일깨우기를|Gāyatrī mantra: we meditate on the glorious light of Savitṛ; may he inspire our minds|mantra|『리그베다』 3.62.10. 가장 널리 외우는 베다 만트라
+ॐ त्र्यम्बकं यजामहे सुगन्धिं पुष्टिवर्धनम् उर्वारुकमिव बन्धनान् मृत्योर्मुक्षीय माऽमृतात्|oṃ tryambakaṃ yajāmahe sugandhiṃ puṣṭivardhanam urvārukam iva bandhanān mṛtyor mukṣīya mā'mṛtāt|옴 트리얌바캄 야자마헤 수간딤 푸슈티바르다남 우르바루카미바 반다난 므리티요르 묵시야 마므리타트|ind.|마하므리티윤자야 만트라: 향기롭고 번영을 주는 세 눈의 신(시바)께 제사하니, 익은 오이가 덩굴에서 떨어지듯 죽음에서 벗어나 불멸에 이르게 하소서|Mahāmṛtyuñjaya mantra: liberate us from death as a ripe cucumber from its vine, not from immortality|mantra|『리그베다』 7.59.12. '죽음을 이기는 위대한 만트라'
+हरे कृष्ण हरे कृष्ण कृष्ण कृष्ण हरे हरे हरे राम हरे राम राम राम हरे हरे|hare kṛṣṇa hare kṛṣṇa kṛṣṇa kṛṣṇa hare hare hare rāma hare rāma rāma rāma hare hare|하레 크리슈나 하레 크리슈나 크리슈나 크리슈나 하레 하레 하레 라마 하레 라마 라마 라마 하레 하레|ind.|하레 크리슈나 마하만트라: 신의 이름을 부르는 염송|Hare Kṛṣṇa mahāmantra|mantra|hare는 하리 또는 하라(라다)를 부르는 말
+श्री राम जय राम जय जय राम|śrī rāma jaya rāma jaya jaya rāma|슈리 라마 자야 라마 자야 자야 라마|ind.|거룩한 라마여, 승리하소서|Glory to Śrī Rāma, victory to Rāma|mantra|
+ॐ शान्तिः शान्तिः शान्तिः|oṃ śāntiḥ śāntiḥ śāntiḥ|옴 샨티 샨티 샨티|ind.|평화, 평화, 평화 (기도의 끝맺음)|Om, peace, peace, peace|mantra|몸·자연·신의 세 가지 괴로움이 가라앉기를 바라는 뜻으로 풀이함
+ॐ सह नाववतु|oṃ saha nāvavatu|옴 사하 나바바투|ind.|우리 둘을 함께 보호하소서 (스승과 제자의 평화 기도)|Om, may he protect us both together|mantra|『타이티리야 우파니샤드』의 평화 기도 첫 구절
+ॐ पूर्णमदः पूर्णमिदं पूर्णात्पूर्णमुदच्यते|oṃ pūrṇam adaḥ pūrṇam idaṃ pūrṇāt pūrṇam udacyate|옴 푸르나마다 푸르나미담 푸르나트 푸르나무다차테|ind.|저것도 충만하고 이것도 충만하다, 충만에서 충만이 나온다|Om, that is full, this is full; from the full the full arises|mantra|『이샤 우파니샤드』의 평화 기도
+गुरुर्ब्रह्मा गुरुर्विष्णुः गुरुर्देवो महेश्वरः|gurur brahmā gurur viṣṇuḥ gurur devo maheśvaraḥ|구루르 브라흐마 구루르 비슈누 구루르 데보 마헤슈바라하|ind.|스승은 브라흐마요, 스승은 비슈누요, 스승은 위대한 신 시바이다|the guru is Brahmā, the guru is Viṣṇu, the guru is Maheśvara|mantra|구루 찬가(guru stotra)
+सर्वे भवन्तु सुखिनः|sarve bhavantu sukhinaḥ|사르베 바반투 수키나하|ind.|모두가 행복하기를|may all be happy|mantra|
+ॐ नमो बुद्धाय|oṃ namo buddhāya|옴 나모 붓다야|ind.|부처님께 귀의합니다|Om, homage to the Buddha|mantra|
+नमो अमिताभाय|namo amitābhāya|나모 아미타바야|ind.|아미타불께 귀의합니다|homage to Amitābha|mantra|'나무아미타불'의 원어 계열(namo amitābhāya buddhāya)
+बुद्धं शरणं गच्छामि|buddhaṃ śaraṇaṃ gacchāmi|붓담 샤라남 갓차미|ind.|부처님께 귀의합니다|I go to the Buddha for refuge|mantra|삼귀의 1
+धर्मं शरणं गच्छामि|dharmaṃ śaraṇaṃ gacchāmi|다르맘 샤라남 갓차미|ind.|가르침에 귀의합니다|I go to the Dharma for refuge|mantra|삼귀의 2
+सङ्घं शरणं गच्छामि|saṅghaṃ śaraṇaṃ gacchāmi|상감 샤라남 갓차미|ind.|승가에 귀의합니다|I go to the Saṅgha for refuge|mantra|삼귀의 3
+ॐ आः हूँ|oṃ āḥ hūṃ|옴 아 훔|ind.|몸·말·마음을 맑히는 세 음절 진언|Om āḥ hūṃ|mantra|밀교에서 몸(oṃ)·말(āḥ)·마음(hūṃ)에 대응시킴
+ॐ तारे तुत्तारे तुरे स्वाहा|oṃ tāre tuttāre ture svāhā|옴 타레 투타레 투레 스바하|ind.|타라 보살 진언|mantra of Tārā|mantra|
+ॐ अ र प च न धीः|oṃ a ra pa ca na dhīḥ|옴 아 라 파 차 나 디|ind.|문수보살 진언|mantra of Mañjuśrī|mantra|a ra pa ca na는 반야경 계통의 글자 순서(아라파차나 자모)
+ॐ वज्रसत्त्व हूँ|oṃ vajrasattva hūṃ|옴 바즈라삿트바 훔|ind.|금강살타 진언 (짧은 형태)|mantra of Vajrasattva|mantra|
+ॐ अमोघ वैरोचन महामुद्रा मणि पद्म ज्वाल प्रवर्तय हूँ|oṃ amogha vairocana mahāmudrā maṇi padma jvāla pravartaya hūṃ|옴 아모가 바이로차나 마하무드라 마니 파드마 즈발라 프라바르타야 훔|ind.|광명진언: 헛되지 않은 비로자나의 큰 인(印)이여, 보주와 연꽃의 빛을 펼치소서|Mantra of Light|mantra|한국 불교 독송: '옴 아모가 바이로차나 마하무드라 마니 파드마 즈바라 프라바릍타야 훔' 등
+श्री श्री महाश्री सुश्री स्वाहा|śrī śrī mahāśrī suśrī svāhā|슈리 슈리 마하슈리 수슈리 스바하|ind.|정구업진언: 상서롭고 크게 상서롭기를|mantra purifying speech|mantra|한국 불교 독송: '수리수리 마하수리 수수리 사바하'
+हूँ|hūṃ|훔|ind.|훔 (진언의 종자 음절)|seed syllable hūṃ|mantra|
+फट्|phaṭ|파트|ind.|팟 (장애를 깨뜨리는 진언 끝소리)|seed syllable phaṭ|mantra|
+ह्रीं|hrīṃ|흐림|ind.|흐림 (여신의 종자 음절)|seed syllable hrīṃ|mantra|
+श्रीं|śrīṃ|슈림|ind.|슈림 (락슈미의 종자 음절)|seed syllable śrīṃ|mantra|
+क्लीं|klīṃ|클림|ind.|클림 (끌어당김·사랑의 종자 음절)|seed syllable klīṃ|mantra|
+ऐं|aiṃ|아임|ind.|아임 (사라스바티의 종자 음절)|seed syllable aiṃ|mantra|
+गं|gaṃ|감|ind.|감 (가네샤의 종자 음절)|seed syllable gaṃ|mantra|
+लं|laṃ|람|ind.|람 (뿌리 차크라의 종자 음절)|seed syllable of the root chakra|mantra|차크라 종자: laṃ·vaṃ·raṃ·yaṃ·haṃ·oṃ
+वं|vaṃ|밤|ind.|밤 (천골 차크라의 종자 음절)|seed syllable of the sacral chakra|mantra|
+रं|raṃ|람|ind.|람 (배꼽 차크라의 종자 음절)|seed syllable of the navel chakra|mantra|
+यं|yaṃ|얌|ind.|얌 (가슴 차크라의 종자 음절)|seed syllable of the heart chakra|mantra|
+हं|haṃ|함|ind.|함 (목 차크라의 종자 음절)|seed syllable of the throat chakra|mantra|
+प्रणव|praṇava|프라나바|m.|성음 옴|the sacred syllable Om|mantra|
+ओंकार|oṃkāra|옴카라|m.|옴이라는 소리, 옴 글자|the sound Om|mantra|
+उद्गीथ|udgītha|우드기타|m.|옴을 크게 읊음 (사마베다의 영창)|chanting of Om|mantra|
+पञ्चाक्षर|pañcākṣara|판차크샤라|m.|다섯 음절 진언 (na-maḥ-śi-vā-ya)|the five-syllable mantra|mantra|
+षडक्षर|ṣaḍakṣara|샤다크샤라|m.|여섯 음절 진언 (옴 마니 반메 훔)|the six-syllable mantra|mantra|
+महामन्त्र|mahāmantra|마하만트라|m.|위대한 진언 (하레 크리슈나 만트라)|great mantra|mantra|
+गायत्री|gāyatrī|가야트리|f.|가야트리 운율; 가야트리 만트라|the Gāyatrī metre or mantra|mantra|8음절 × 3구의 베다 운율
+नामजप|nāmajapa|나마자파|m.|신의 이름을 거듭 외움|repetition of the divine name|mantra|
+सहस्रनाम|sahasranāma|사하스라나마|n.|천 개의 이름 (신의 이름을 읊는 찬가)|the thousand names|mantra|예: Viṣṇu-sahasranāma
+अष्टोत्तरशतनाम|aṣṭottaraśatanāma|아슈토타라샤타나마|n.|108개의 이름|the 108 names|mantra|
+अजपा|ajapā|아자파|f.|저절로 이루어지는 염송 (숨에 실린 so'ham)|unrecited mantra|mantra|
+नाद|nāda|나다|m.|소리; 내면에서 울리는 소리|sound, inner sound|mantra|나다 요가(nāda yoga)
+ध्वनि|dhvani|드바니|m.|소리, 울림; 암시|sound, resonance; suggestion|mantra|
+पुरश्चरण|puraścaraṇa|푸라슈차라나|n.|정해진 횟수만큼 만트라를 외우는 수행|preparatory recitation of a mantra|mantra|
+न्यास|nyāsa|니야사|m.|몸의 각 부위에 진언을 놓는 의식|placing of mantras on the body|mantra|
 `;
 
 const CATS = [
-  ["all", "전체"], ["basic", "기초 어휘"], ["num", "숫자"], ["bud", "불교"], ["yoga", "요가"], ["spirit", "영성"], ["ayur", "아유르베다"],
+  ["all", "전체"], ["basic", "기초 어휘"], ["num", "숫자"], ["bud", "불교"], ["mantra", "만트라"], ["yoga", "요가"], ["spirit", "영성"], ["ayur", "아유르베다"],
   ["phil", "철학·종교"], ["god", "신과 신화"], ["lang", "언어·문학"], ["root", "동사 어근"],
   ["d-a", "Apte"], ["d-m", "Monier-Williams"], ["d-b", "Edgerton 불교"]
 ];
@@ -1532,8 +1592,12 @@ function scoreCore(en, Q) {
   if (Q.isHangul) {
     const w = raw.replace(/\s+/g, "");
     const toks = en.kTokens ??= en.k.split(/[\s,;·()\[\]/:'"]+/).filter(Boolean);
-    if (en.h === w) s = 100;
+    const hNoSpace = en.hNoSpace ??= en.h.replace(/\s+/g, "");
+    if (en.h === w || hNoSpace === w) s = 100;
     else if (toks.includes(w)) s = 90;
+    else if ((en.hTokens ??= en.h.split(/\s+/)).includes(w)) s = 85;
+    else if (w.length >= 3 && hNoSpace.includes(w)) s = 70;
+    else if (w.length >= 2 && en.x.includes(w)) s = 55;   // 참고란(예: 한국 불교 독송 '수리수리 마하수리')
     else if (w.length >= 2 && en.h.startsWith(w)) s = 75;
     else if (w.length >= 2 && en.k.includes(w)) s = 50;
   }
