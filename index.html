@@ -161,6 +161,8 @@ footer .iast-inline { font-family: var(--f-iast); }
 .ko-trans .btn { justify-self: start; padding: 7px 14px; }
 .btn-primary { background: var(--ink); border-color: var(--ink); color: var(--bg); }
 .btn-primary:hover { color: var(--bg); opacity: 0.9; }
+.ko-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ko-actions .btn { text-decoration: none; }
 .ko-trans .btn-quiet { padding: 3px 10px; font-size: 0.8rem; }
 .chip-sep { width: 1px; align-self: stretch; background: var(--line); margin-inline: 4px; }
 .chip-dict { border-style: dashed; }
@@ -1572,6 +1574,42 @@ const htmlText = (html, max = 8000) => {
   return div.textContent.replace(/\s+/g, " ").trim().slice(0, max);
 };
 let koCtx = null;   // 지금 상세 화면의 {key, src, ids}
+// 구글 번역 주소(주소 길이 한도 때문에 앞부분만)
+let gtText = "";
+const gtUrl = () => "https://translate.google.com/?sl=en&tl=ko&op=translate&text=" +
+  encodeURIComponent((gtText || (koCtx ? itemByKey(koCtx.key)?.iDisp || "" : "")).slice(0, 1800));
+const gtButton = (primary) => `<a class="btn ${primary ? "btn-primary" : "btn-quiet"}" id="gt-link" href="${gtUrl()}" target="_blank" rel="noopener">구글 번역으로 보기</a>`;
+// 구글 번역(영→한)을 페이지 안에서 바로 받기. 뜻 하나가 한 줄이 되도록 줄 단위로 보냄.
+const gtCache = new Map();   // "사전:번호" → 한국어 줄 목록
+let gtLines = [];             // 지금 항목의 영어 줄들
+async function googleKo(lines) {
+  const out = [];
+  let batch = [];
+  const flush = async () => {
+    if (!batch.length) return;
+    const r = await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ko&dt=t&q=" + encodeURIComponent(batch.join("\n")));
+    if (!r.ok) throw new Error(r.status);
+    const data = await r.json();
+    out.push(...data[0].map(x => x[0]).join("").split("\n"));
+    batch = [];
+  };
+  for (const line of lines) {
+    if ((batch.join("\n") + line).length > 1500) await flush();
+    batch.push(line.slice(0, 1500));
+  }
+  await flush();
+  return out.map(x => x.trim()).filter(Boolean);
+}
+async function autoGoogle() {
+  if (window.claude?.use || !koCtx || !gtLines.length) return;
+  const id = koId(koCtx.src, koCtx.ids[0]), key = koCtx.key;
+  if (koCache.has(id)) return;   // 미리 정리된 한국어 풀이가 있으면 그걸 씀
+  if (!gtCache.has(id)) {
+    try { gtCache.set(id, await googleKo(gtLines)); }
+    catch { gtCache.set(id, null); }
+  }
+  if (state.sel === key) paintKo();
+}
 function paintKo() {
   const box = $("ko-trans");
   if (!box || !koCtx || state.sel !== koCtx.key) return;
@@ -1586,12 +1624,19 @@ function paintKo() {
       (val.summary ? `<p class="ko-sum">${esc(String(val.summary))}</p>` : "") +
       `<ol class="ko-senses">${val.senses.map(s => `<li>${esc(String(s))}</li>`).join("")}</ol>` +
       (note ? `<p class="ko-note">${esc(note)}</p>` : "") +
-      (sampleBlocked ? "" : `<button type="button" class="btn btn-quiet" data-ko="redo">다시 번역</button>`);
+      `<div class="ko-actions">${sampleBlocked || !window.claude?.use ? "" : `<button type="button" class="btn btn-quiet" data-ko="redo">다시 번역</button>`}${gtButton(false)}</div>`;
+  } else if (!window.claude?.use && gtCache.get(id)) {
+    box.innerHTML = head('<span class="auto">구글 기계 번역</span>') +
+      `<ol class="ko-senses">${gtCache.get(id).map(t => `<li>${esc(t)}</li>`).join("")}</ol>
+      <p class="ko-note">기계 번역이라 산스크리트 낱말이 어색하게 바뀔 수 있어요. 아래 영어 풀이와 비교하세요.</p>`;
+  } else if (!window.claude?.use && !gtCache.has(id)) {
+    box.innerHTML = head() + `<p class="ko-note">한국어로 바꾸는 중…</p>`;
   } else if (sampleBlocked || !window.claude?.use) {
-    box.innerHTML = head() + `<p class="ko-note">아직 정리된 한국어 풀이가 없습니다. 크롬의 <b>한국어로 번역</b>을 켜면 아래 영어 풀이가 한국어로 바뀝니다. 기계 번역이라 어색하면 '영어 원문 그대로 보기'와 비교하세요.</p>`;
+    box.innerHTML = head() + `<p class="ko-note">아직 정리된 한국어 풀이가 없습니다. 아래 버튼을 누르면 이 항목의 영어 풀이를 구글 번역에서 한국어로 볼 수 있어요. 크롬에서는 화면에서 마우스 오른쪽 버튼 → <b>한국어(으)로 번역</b>으로 페이지째 바꿀 수도 있습니다.</p>
+      <div class="ko-actions">${gtButton(true)}</div>`;
   } else {
     box.innerHTML = head() + `<p class="ko-note">${esc(note || "아직 한국어 풀이가 없습니다. 누르면 Claude가 아래 사전 풀이를 한국어로 옮기고, 저장해 두었다가 다음부터 바로 보여 줍니다.")}</p>
-      <button type="button" class="btn btn-primary" data-ko="go">한국어로 풀이하기</button>`;
+      <div class="ko-actions"><button type="button" class="btn btn-primary" data-ko="go">한국어로 풀이하기</button>${gtButton(false)}</div>`;
   }
 }
 async function translateKo(ctx, en, redo) {
@@ -1696,10 +1741,16 @@ function headDetail(en) {
     const ids = avail.find(([s]) => s === state.tab)[1];
     koCtx = { key, src: state.tab, ids };
     const id = koId(state.tab, ids[0]);
-    if (koCache.has(id)) paintKo(); else readKorean(state.tab, ids[0]).then(paintKo);
+    if (koCache.has(id)) paintKo(); else readKorean(state.tab, ids[0]).then(() => { paintKo(); autoGoogle(); });
     const src = state.tab;
+    gtText = ""; gtLines = [];
     Promise.all(ids.slice(0, 120).map(n => record(src, n))).then(recs => {
       if (state.sel !== key || state.tab !== src || !$("dict-body")) return;
+      // 뜻 번호([1], [2] …)마다 한 줄로 나눠서 번역해야 목록으로 보기 좋음
+      gtLines = recs.slice(0, 40).flatMap(r => htmlText(typeof r === "string" ? r : r[r.length - 1], 1500).split(/\s*(?=\[\d+\]\s)/)).map(t => t.trim()).filter(Boolean).slice(0, 60);
+      gtText = en.iDisp + "\n" + gtLines.join("\n");
+      autoGoogle();
+      if ($("gt-link")) $("gt-link").href = gtUrl();
       let html;
       if (src === "a") html = recs.map(r => `<div class="rec">${r.replace('<span class="comp">Comp.</span>', '<span class="comp">합성어</span>')}</div>`).join("");
       else {
