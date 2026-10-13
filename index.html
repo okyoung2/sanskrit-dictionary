@@ -173,7 +173,6 @@ footer .iast-inline { font-family: var(--f-iast); }
 .item .src-lemma { color: var(--ink); border-color: var(--ink); border-style: dashed; }
 .lemma-note { margin: 0; padding: 10px 14px; border-radius: 6px; background: var(--ink-soft); font-size: 0.9rem; }
 .item .src-en { color: var(--turmeric); border-color: var(--turmeric); border-style: dashed; }
-.item .src-ko { color: var(--ink); border-color: var(--ink); }
 .src-tabs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid var(--line); }
 .src-tab { border: 1px solid transparent; border-bottom: 0; background: transparent; padding: 7px 14px; border-radius: 6px 6px 0 0; font-size: 0.9rem; color: var(--muted); margin-bottom: -1px; }
 .src-tab[aria-selected="true"] { color: var(--fg); background: var(--surface); border-color: var(--line); font-weight: 600; }
@@ -197,6 +196,8 @@ footer .iast-inline { font-family: var(--f-iast); }
 .kakao p { margin: 0; flex: 1 1 16rem; font-size: 0.9rem; }
 .kakao .btn { padding: 7px 14px; text-decoration: none; }
 .orig { border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; }
+/* 위 본문이 이미 영어일 땐 겹치므로, 크롬이 페이지를 번역했을 때만 보여 줌 */
+html:not(.translated-ltr):not(.translated-rtl) .orig { display: none; }
 .orig summary { cursor: pointer; font-size: 0.85rem; color: var(--muted); }
 .orig-sub { font-size: 0.78rem; margin-left: 6px; opacity: 0.8; }
 .orig[open] summary { margin-bottom: 8px; }
@@ -208,6 +209,10 @@ footer .iast-inline { font-family: var(--f-iast); }
 .alpha-head h2 { margin: 0; font-size: 1.35rem; text-wrap: balance; }
 .alpha-head h2 span { font-family: var(--f-deva); font-weight: 400; color: var(--ink); margin-left: 8px; }
 .alpha-head p, .alpha-note { margin: 0; color: var(--muted); font-size: 0.9rem; max-width: 70ch; }
+.alpha-note span[lang] { font-family: var(--f-deva); color: var(--fg); }
+.alpha-note b { color: var(--fg); }
+.vowel-sign .mat { color: var(--turmeric); }
+.vowel-sign .mat-arrow, .vowel-sign .mat-none { font-size: 0.75rem; color: var(--muted); }
 .alpha-sec { display: grid; gap: 12px; }
 .alpha-sec h3 { margin: 0; font-size: 1.1rem; }
 .alpha-sec h3 .sub, .other-group h4 .sub { font-weight: 400; color: var(--muted); font-size: 0.82rem; margin-left: 6px; }
@@ -238,11 +243,38 @@ footer .iast-inline { font-family: var(--f-iast); }
 .other-group h4 { margin: 0 0 8px; font-size: 0.95rem; }
 .other-cells { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .other { display: grid; gap: 4px; align-content: start; }
+.sk-card { display: grid; gap: 10px; align-content: start; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.sk-head { display: flex; gap: 12px; align-items: center; }
+.sk-g { font-family: var(--f-deva); font-size: 1.6rem; color: var(--ink); }
+.sk-count { display: block; font-size: 0.8rem; color: var(--muted); }
+.sk-play { display: grid; justify-items: center; gap: 2px; padding: 4px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); flex: none; }
+.sk-play:hover { border-color: var(--ink); }
+.sk-anim { width: 88px; height: 88px; }
+.sk-anim path, .sk-frame path { fill: none; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+.sk-anim path { stroke: var(--ink); }
+@media (prefers-reduced-motion: no-preference) {
+  .sk-anim path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: sk-draw .8s ease-in-out forwards; }
+}
+@keyframes sk-draw { to { stroke-dashoffset: 0; } }
+.sk-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.sk-steps li { display: grid; grid-template-columns: 52px 1.5rem minmax(0, 1fr); gap: 8px; align-items: center; }
+.sk-frame { width: 52px; height: 52px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); }
+.sk-frame .sk-done { stroke: var(--line); }
+.sk-frame .sk-now { stroke: var(--turmeric); }
+.sk-frame .sk-start { fill: var(--ink); }
+.akc-main { touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.sk-dlg { border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: var(--bg); color: var(--fg); width: min(24rem, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; }
+.sk-dlg::backdrop { background: rgb(0 0 0 / 0.45); }
+.sk-dlg-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.sk-dlg-top h3 { margin: 0; font-size: 1.05rem; }
+.sk-none { margin: 0; font-size: 0.92rem; line-height: 1.7; }
+.sk-none span[lang] { font-family: var(--f-deva); }
 .sign-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); gap: 10px; }
 .sign { display: grid; justify-items: center; gap: 2px; padding: 10px 6px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
 .sign-d { font-family: var(--f-deva); font-size: 1.9rem; line-height: 1.3; color: var(--ink); }
 @media (max-width: 480px) { .other-cells { grid-template-columns: repeat(2, minmax(0, 1fr)); } .akc-d { font-size: 1.9rem; } }
-.akc-spk { color: var(--muted); line-height: 0; margin-top: 2px; }
+.akc-line { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; column-gap: 5px; line-height: 1.3; }
+.akc-spk { color: var(--muted); line-height: 0; align-self: center; }
 .alpha-tip { margin: 0; display: flex; gap: 10px; align-items: flex-start; padding: 12px 16px; border-radius: 8px; background: var(--ink-soft); border: 1px solid var(--ink); font-size: 0.92rem; max-width: 70ch; }
 .alpha-tip .spk { flex: none; color: var(--ink); margin-top: 2px; }
 .alpha-tip b { color: var(--ink); }
@@ -270,7 +302,7 @@ footer p { margin: 0; }
   </div>
   <header translate="no" lang="ko">
     <h1><span class="deva">शब्दकोश</span> 산스크리트 소사전</h1>
-    <div class="head-right"><span class="count" id="count"></span><button type="button" class="btn" id="alpha-btn" aria-pressed="false">자모표 보기</button></div>
+    <div class="head-right"><span class="count" id="count"></span><button type="button" class="btn" id="alpha-btn" aria-pressed="false">자음+모음 보기</button></div>
   </header>
 
   <div class="searchbar" translate="no" lang="ko">
@@ -1389,6 +1421,115 @@ const ALPHA_SIGNS = [   // 기호와 자주 보는 합자
   ["kṣa", "क्ष", "क्ष", "크샤", "k + ṣ 합자"], ["jña", "ज्ञ", "ज्ञ", "그냐/즈냐", "j + ñ 합자 (prajñā의 jñā)"],
   ["tra", "त्र", "त्र", "트라", "t + r 합자 (mantra의 tra)"], ["śra", "श्र", "श्र", "슈라", "ś + r 합자 (śrī의 śr)"],
 ];
+// 글자마다 손글씨 획을 쓰는 차례(자모표 칸을 두 번 누르면 팝업으로). 100×100 칸, 머리줄 y=20·바닥 y=70.
+// 글자 → [[SVG 경로, 설명] …]. 세로획(SK_V)·머리줄(SK_H)은 모양이 같아 함수로 만듦.
+const SK_V = (x, t) => [`M${x} 20 L${x} 70`, t || "오른쪽 세로획을 위에서 아래로"];
+const SK_H = (x1, x2) => [`M${x1} 20 L${x2} 20`, "머리줄을 왼쪽에서 오른쪽으로 — 맨 마지막에"];
+const SK_A = ["M18 24 C29 18 45 22 43 32 C41 39 33 41 27 41 C41 41 51 47 49 55 C47 64 37 67 29 66 C23 66 19 63 16 59", "숫자 3 같은 몸통을 위에서 아래로"];
+const SK_A_BAR = ["M43 42 L66 42", "몸통 가운데에서 오른쪽으로 가로획"];
+const SK_I = ["M36 27 C52 24 64 28 62 37 C60 45 50 47 45 48 C38 50 34 56 38 60 C42 64 48 60 46 56 C44 52 40 56 42 62 C46 70 56 76 64 80", "위쪽 곡선에서 내려와 오른쪽 아래 꼬리까지 한 번에"];
+const SK_RI = [["M50 28 C62 22 76 28 72 38 C70 44 62 46 58 46 C72 46 80 54 76 64 C72 72 60 72 52 68", "오른쪽의 3 모양 곡선을 위에서 아래로"], ["M24 66 L58 40", "왼쪽 아래에서 오른쪽 위로 비스듬한 획"]];
+const SK_E = [["M39 20 L39 50 Q39 60 48 66 L60 74 Q66 78 66 82", "왼쪽 세로로 내려와 오른쪽 아래로 꼬리"], ["M63 20 L63 40 Q63 52 46 60", "오른쪽 획을 내려 왼쪽 획에 붙임"]];
+const STROKES = {
+  "अ": [["M27 24 C38 18 54 22 52 32 C50 39 42 41 36 41 C50 41 60 47 58 55 C56 64 46 67 38 66 C32 66 28 63 25 59", SK_A[1]], ["M52 42 L71 42", SK_A_BAR[1]], SK_V(71), SK_H(26, 81)],
+  "आ": [SK_A, SK_A_BAR, SK_V(66), SK_V(80, "오른쪽에 세로획을 하나 더 (긴 ā 표시)"), SK_H(17, 88)],
+  "इ": [SK_I, SK_H(28, 72)],
+  "ई": [SK_I, SK_H(28, 72), ["M52 20 C52 10 58 6 66 4", "머리줄 위로 갈고리를 올려 그음 (긴 ī 표시)"]],
+  "उ": [["M30 27 C40 23 49 27 47 34 C45 40 38 42 35 42 C24 46 22 60 30 67 C38 74 56 74 63 66 C67 60 67 52 64 48", "위쪽 작은 곡선에 이어 아래 큰 곡선까지 한 번에"], SK_H(23, 77)],
+  "ऊ": [["M22 27 C32 23 41 27 39 34 C37 40 30 42 27 42 C16 46 14 60 22 67 C30 74 48 74 55 66 C59 60 59 52 56 48", "위쪽 작은 곡선에 이어 아래 큰 곡선까지 한 번에"], ["M56 50 C66 42 80 46 76 58 C74 64 70 68 68 72", "오른쪽에 꼬리를 덧붙임 (긴 ū 표시)"], SK_H(14, 86)],
+  "ऋ": [...SK_RI, SK_H(17, 84)],
+  "ॠ": [...SK_RI, ["M60 62 C68 64 74 70 82 72", "아래 오른쪽 꼬리를 덧붙임 (긴 ṝ 표시)"], SK_H(17, 84)],
+  "ऌ": [["M50 22 C38 26 28 38 30 54 C32 70 46 72 50 58 C54 46 50 40 50 40", "머리줄 아래에서 시작해 왼쪽으로 둥근 고리"], ["M50 48 C58 40 68 44 66 54 C64 62 68 68 78 66", "가운데에서 오른쪽으로 굽은 꼬리"], SK_H(21, 79)],
+  "ए": [...SK_E, SK_H(28, 72)],
+  "ऐ": [...SK_E, SK_H(28, 72), ["M40 4 L58 20", "머리줄 위에 비스듬한 획 (ai 표시)"]],
+  "ओ": [SK_A, SK_A_BAR, SK_V(66), SK_V(80, "오른쪽에 세로획을 하나 더"), SK_H(17, 88), ["M58 4 C66 4 72 12 74 20", "세로획 위에 갈고리 (o 표시)"]],
+  "औ": [SK_A, SK_A_BAR, SK_V(66), SK_V(80, "오른쪽에 세로획을 하나 더"), SK_H(17, 88), ["M54 6 C62 6 68 12 70 20", "세로획 위에 첫째 갈고리"], ["M64 2 C74 2 80 10 82 18", "그 옆에 둘째 갈고리 (au 표시)"]],
+  "क": [["M50 47 C44 36 26 34 24 46 C22 60 40 62 50 47", "가운데에서 시작해 왼쪽 고리를 돌아 제자리로"], ["M50 47 C56 38 72 36 75 46 C77 54 70 60 64 62", "다시 가운데에서 오른쪽 갈고리"], SK_V(50, "가운데 세로획을 위에서 아래로"), SK_H(17, 83)],
+  "ख": [["M26 28 C36 26 40 36 32 42 C38 52 42 58 46 64", "왼쪽 र 모양 갈고리"], ["M71 34 C60 30 48 34 48 46 C48 60 62 68 71 58", "오른쪽에 둥근 고리"], SK_V(71), SK_H(18, 82)],
+  "ग": [["M39 20 L39 50 Q39 56 35 56", "왼쪽 짧은 세로획, 끝을 왼쪽으로 살짝 꺾음"], SK_V(63), SK_H(21, 69)],
+  "घ": [["M33 20 L33 30 C33 38 45 38 45 30 C45 23 35 24 34 34 L34 46 C36 58 44 62 52 60 C58 58 62 52 64 46", "왼쪽 위 작은 고리를 그리고 내려와 둥글게 오른쪽으로"], SK_V(64), SK_H(25, 74)],
+  "ङ": [["M38 22 C34 26 34 34 40 36 C50 38 60 40 62 50 C64 62 56 70 46 70 C38 70 30 64 26 54", "짧게 내려와 오른쪽으로 크게 감아 돌림"], SK_H(18, 82), ["M71 40 L71 40.1", "오른쪽에 점"]],
+  "च": [["M52 36 L40 36 C32 36 30 50 40 52 L65 52", "가운데에서 왼쪽으로 갔다가 둥글게 내려와 오른쪽으로"], SK_V(65), SK_H(23, 75)],
+  "छ": [["M50 22 C46 28 40 32 36 36 C30 40 30 48 38 48 L48 48", "위에서 왼쪽으로 작은 고리"], ["M48 48 C38 50 32 58 36 64 C42 72 58 72 64 62 C70 52 64 30 54 30 C46 30 46 42 50 48", "아래 큰 고리를 돌려 가운데로"], SK_H(18, 80)],
+  "ज": [["M26 31 C28 50 36 62 46 62 C54 62 58 52 58 44 L67 44", "왼쪽 위에서 내려와 둥글게 돌아 오른쪽 가로로"], SK_V(67), SK_H(22, 78)],
+  "झ": [["M30 30 C42 26 56 28 54 38 C52 46 42 46 38 46 C50 48 54 54 50 60 C46 64 36 62 32 66 C30 70 36 72 40 70 L54 80", "위 곡선에서 내려와 왼쪽 고리, 아래 꼬리까지"], ["M50 40 L69 40", "가운데에서 세로획 자리까지 가로획"], SK_V(69), SK_H(21, 79)],
+  "ञ": [["M36 38 C46 32 58 38 56 48 C54 58 44 60 38 58 C32 56 28 50 26 44", "가운데에서 오른쪽으로 둥글게 돌아 왼쪽 위로"], ["M56 46 L69 46", "세로획 자리까지 가로획"], SK_V(69), SK_H(20, 80)],
+  "ट": [["M50 20 L50 30 C38 30 30 38 30 48 C30 60 40 66 52 66 L66 64", "머리줄 자리에서 짧게 내려와 왼쪽으로 둥글게, 오른쪽으로 마무리"], SK_H(27, 74)],
+  "ठ": [["M54 20 L54 30 C40 30 30 40 30 52 C30 64 40 70 50 70 C60 70 68 62 68 52 C68 40 60 32 54 32", "짧게 내려와 동그라미를 한 바퀴"], SK_H(24, 76)],
+  "ड": [["M40 20 L40 32 C40 38 48 40 56 42 C64 44 68 52 66 60 C64 68 56 70 50 70 C40 70 32 62 28 52", "짧게 내려와 오른쪽으로 크게 감아 왼쪽 위로"], SK_H(23, 77)],
+  "ढ": [["M44 20 L44 30 C34 32 30 40 34 46 C30 52 30 64 40 68 C52 72 64 66 64 56 C64 48 56 44 50 48 C46 52 50 58 54 56", "짧게 내려와 아래 고리를 그리고 안쪽으로 말아 넣음"], SK_H(25, 74)],
+  "ण": [["M28 20 L28 46 C28 56 34 58 40 58 C48 58 52 54 52 46 L52 20", "왼쪽 위에서 U 모양을 한 번에"], SK_V(68), SK_H(21, 79)],
+  "त": [["M63 40 L42 40 C34 42 32 50 34 58 C36 64 42 68 48 70", "세로획 자리에서 왼쪽으로 가로획, 이어서 아래로 둥글게"], SK_V(63), SK_H(26, 74)],
+  "थ": [["M44 32 C50 26 46 18 40 18 C32 18 32 28 40 32 C34 36 32 46 34 52 C38 62 52 62 63 50", "왼쪽 위 작은 고리를 그리고 내려와 둥글게 오른쪽으로"], SK_V(63), SK_H(48, 74)],
+  "द": [["M50 20 L50 34 C40 34 34 40 34 50 C34 60 42 64 54 62 C62 60 64 52 58 50 C52 50 54 60 60 66 L68 74", "짧게 내려와 왼쪽으로 둥글게, 작은 고리 뒤 꼬리"], SK_H(24, 73)],
+  "ध": [["M44 32 C50 26 46 18 40 18 C32 18 32 28 40 32 C34 38 34 54 40 60 C46 64 58 60 63 48", "왼쪽 위 작은 고리를 그리고 내려와 둥글게 오른쪽으로"], SK_V(63), SK_H(50, 74)],
+  "न": [["M35 50 C35 44 36 40 40 40 L63 40", "왼쪽 끝에서 시작해 오른쪽으로 가로획"], SK_V(63), SK_H(26, 73)],
+  "प": [["M38 20 L38 46 C38 54 44 56 50 56 C56 56 60 52 63 48", "왼쪽 위에서 내려와 둥글게 오른쪽으로"], SK_V(63), SK_H(27, 73)],
+  "फ": [["M29 20 L29 46 C29 54 36 56 42 56 C46 56 50 52 50 48", "왼쪽 위에서 내려와 둥글게 가운데로"], SK_V(50, "가운데 세로획을 위에서 아래로"), ["M50 32 C60 26 76 30 76 42 C76 50 70 56 64 60", "가운데에서 오른쪽 갈고리"], SK_H(17, 84)],
+  "ब": [["M63 32 C50 26 34 30 33 44 C32 56 44 60 54 58 C60 56 63 52 63 48", "오른쪽 위에서 시작해 둥근 몸통"], ["M40 30 L58 52", "몸통 안에 비스듬한 획"], SK_V(63), SK_H(24, 73)],
+  "भ": [["M34 26 C30 20 36 14 42 18 C44 22 42 28 42 32 L42 46 C42 54 34 54 34 48 C34 44 40 44 46 46 L67 46", "왼쪽 위 갈고리에서 내려와 작은 고리, 오른쪽 가로로"], SK_V(67), SK_H(40, 77)],
+  "म": [["M40 20 L40 46 C40 54 32 54 32 48 C32 44 38 44 44 46 L65 46", "왼쪽 세로로 내려와 작은 고리, 오른쪽 가로로"], SK_V(65), SK_H(25, 75)],
+  "य": [["M40 20 C46 26 44 34 36 38 C30 42 30 52 38 54 C46 56 56 54 63 50", "머리줄에서 내려와 왼쪽으로 꺾었다가 둥글게 오른쪽으로"], SK_V(63), SK_H(26, 74)],
+  "र": [["M50 20 C62 24 62 38 50 42 C44 44 40 42 37 39 C42 48 52 60 62 69", "오른쪽으로 둥글게 내려와 왼쪽으로, 이어 오른쪽 아래로 긴 꼬리"], SK_H(33, 71)],
+  "ल": [["M48 40 C44 30 32 30 31 42 C30 56 38 66 50 70", "가운데에서 왼쪽 위로 둥글게 돌아 아래로"], ["M48 40 L66 40", "세로획 자리까지 가로획"], SK_V(66), SK_H(22, 77)],
+  "व": [["M62 34 C50 30 36 32 35 46 C34 58 46 62 54 60 C58 58 62 54 62 50", "오른쪽 위에서 시작해 둥근 몸통"], SK_V(62), SK_H(26, 73)],
+  "श": [["M28 26 C38 22 52 26 50 34 C48 42 36 44 30 44 C24 44 22 50 28 50 C36 50 48 60 56 70", "위 곡선에서 왼쪽으로 돌아 오른쪽 아래로 꼬리"], ["M40 44 L68 44", "세로획 자리까지 가로획"], SK_V(68), SK_H(20, 80)],
+  "ष": [["M38 20 L38 46 C38 54 44 56 50 56 C56 56 60 52 63 48", "왼쪽 위에서 내려와 둥글게 오른쪽으로"], ["M40 22 L60 50", "안쪽에 비스듬한 획"], SK_V(63), SK_H(27, 73)],
+  "स": [["M44 20 C52 28 50 40 40 42 C36 42 32 40 30 38 C36 50 44 62 54 70", "둥글게 내려와 왼쪽으로, 이어 오른쪽 아래로 꼬리"], ["M42 42 L67 42", "세로획 자리까지 가로획"], SK_V(67), SK_H(23, 77)],
+  "ह": [["M58 20 L58 30 L40 30 C32 32 34 42 44 42 C56 42 66 46 64 56 C62 62 56 64 54 62", "짧게 내려와 왼쪽으로 꺾고 오른쪽으로 크게 감음"], ["M42 44 C32 52 34 66 46 72 L56 78", "아래 꼬리"], SK_H(27, 73)],
+};
+function strokeSvg(paths, upto, cls) {   // upto번째 획까지, 마지막 획은 강조하고 시작점 표시
+  return `<svg class="${cls}" viewBox="8 -2 84 88" aria-hidden="true">${paths.slice(0, upto + 1).map(([d], n) => {
+    if (n < upto) return `<path class="sk-done" d="${d}"/>`;
+    const [x, y] = d.slice(1).trim().split(/[\s,]+/);
+    return `<path class="sk-now" d="${d}"/><circle class="sk-start" cx="${x}" cy="${y}" r="8"/>`;
+  }).join("")}</svg>`;
+}
+function strokeAnim(paths) {
+  return `<svg class="sk-anim" viewBox="8 -2 84 88" aria-hidden="true">${paths.map(([d], n) =>
+    `<path d="${d}" pathLength="1" style="animation-delay:${n * 0.9}s"/>`).join("")}</svg>`;
+}
+function strokeCard(g, i, paths) {
+  return `<div class="sk-card">
+    <div class="sk-head">
+      <button type="button" class="sk-play" data-replay title="처음부터 다시 그리기" aria-label="처음부터 다시 그리기">${strokeAnim(paths)}</button>
+      <div><span class="sk-g" lang="sa">${g}</span> <span class="akc-i">${esc(i)}</span><span class="sk-count">${paths.length}획</span></div>
+    </div>
+    <ol class="sk-steps">${paths.map(([, t], n) => `<li>${strokeSvg(paths, n, "sk-frame")}<span class="st-n">${n + 1}</span><span class="st-t">${esc(t)}</span></li>`).join("")}</ol>
+  </div>`;
+}
+// 자모 칸을 두 번 누르면 그 글자의 쓰는 순서를 팝업으로
+function showStrokePopup(glyph, iast) {
+  speechSynthesis?.cancel?.();   // 두 번 누르면서 난 발음은 멈춤
+  let dlg = $("stroke-dlg");
+  if (!dlg) {
+    document.body.insertAdjacentHTML("beforeend", `<dialog class="sk-dlg" id="stroke-dlg" translate="no" lang="ko" aria-labelledby="sk-dlg-title">
+      <div class="sk-dlg-top"><h3 id="sk-dlg-title">쓰는 순서</h3><button type="button" class="btn" data-close>닫기</button></div>
+      <div id="sk-dlg-body"></div></dialog>`);
+    dlg = $("stroke-dlg");
+    dlg.addEventListener("click", e => {
+      if (e.target === dlg || e.target.closest("[data-close]")) { dlg.close(); return; }
+      if (e.target.closest("[data-replay]")) loopStroke();
+    });
+    dlg.addEventListener("close", () => clearTimeout(strokeTimer));
+  }
+  const paths = STROKES[glyph];
+  $("sk-dlg-body").innerHTML = paths ? strokeCard(glyph, iast, paths)
+    : `<p class="sk-none"><span class="sk-g" lang="sa">${glyph}</span> <span class="akc-i">${esc(iast)}</span><br>이 글자의 쓰는 순서는 아직 없어요.</p>`;
+  dlg.showModal();
+  if (paths) loopStroke(paths.length, false);
+}
+// 팝업이 열려 있는 동안 획 그리기를 되풀이: 마지막 획이 끝나고 잠깐 멈췄다가 처음부터
+let strokeTimer = 0, strokeCount = 0;
+function loopStroke(n = strokeCount, restart = true) {
+  strokeCount = n;
+  clearTimeout(strokeTimer);
+  const svg = document.querySelector("#sk-dlg-body .sk-anim");
+  if (!svg || !$("stroke-dlg").open) return;   // 팝업을 닫으면 멈춤
+  if (restart) svg.replaceWith(svg.cloneNode(true));   // 새로 넣어야 애니메이션이 처음부터 다시 돎
+  strokeTimer = setTimeout(loopStroke, ((n - 1) * 0.9 + 0.8) * 1000 + 1500);
+}
+
 const EX_PRIORITY = ["basic", "num", "god", "yoga", "bud", "spirit", "ayur", "phil", "lang", "root"];
 function exampleFor(token) {
   const c = CORE.filter(e => e.t[0] === token && !e.i.includes(" "));
@@ -1398,12 +1539,14 @@ function exampleFor(token) {
 function alphaCell(iast, deva, ko, tip, speakText) {
   const ex = iast ? exampleFor(iast.replace(/a$/, "") || iast) : null;
   return `<div class="akc">
-    <button type="button" class="akc-main" data-speak="${speakText || deva}" title="${esc(tip || "")}">
+    <button type="button" class="akc-main" data-speak="${speakText || deva}" data-glyph="${deva}" data-iast="${esc(iast)}" title="${esc((tip ? tip + "\n" : "") + "두 번 누르면 쓰는 순서")}">
       <span class="akc-d" lang="sa">${deva}</span>
-      <span class="akc-i">${esc(iast)}</span>
-      <span class="akc-k">${esc(ko)}</span>
-      ${IPA[iast] ? `<span class="akc-ipa">[${IPA[iast]}]</span>` : ""}
-      <span class="akc-spk"${canSpeak() ? "" : " hidden"}><svg class="spk" viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M3 7.5h3l4-3.5v12l-4-3.5H3z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M13 7a4 4 0 0 1 0 6M15.5 4.8a7 7 0 0 1 0 10.4"/></svg></span>
+      <span class="akc-line">
+        <span class="akc-i">${esc(iast)}</span>
+        <span class="akc-k">${esc(ko)}</span>
+        ${IPA[iast] ? `<span class="akc-ipa">[${IPA[iast]}]</span>` : ""}
+        <span class="akc-spk"${canSpeak() ? "" : " hidden"}><svg class="spk" viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M3 7.5h3l4-3.5v12l-4-3.5H3z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M13 7a4 4 0 0 1 0 6M15.5 4.8a7 7 0 0 1 0 10.4"/></svg></span>
+      </span>
     </button>
     ${ex ? `<button type="button" class="akc-ex" data-goto="${ex.key}"><span lang="sa">${ex.d}</span> ${esc(ex.i)} · ${esc(ex.k.split(/[,;(]/)[0].trim())}</button>` : `<span class="akc-ex empty"></span>`}
   </div>`;
@@ -1419,15 +1562,18 @@ function renderAlphabet() {
       ${canSpeak()
         ? `<p class="alpha-tip"><svg class="spk" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M3 7.5h3l4-3.5v12l-4-3.5H3z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M13 7a4 4 0 0 1 0 6M15.5 4.8a7 7 0 0 1 0 10.4"/></svg><span><b>글자를 누르면 발음을 들을 수 있어요.</b> 글자 아래의 예시 단어를 누르면 사전에서 그 단어가 열립니다. 소리는 힌디어 음성으로 읽어서 산스크리트 발음과 조금 다를 수 있어요.</span></p>`
         : `<p class="alpha-tip"><span>이 기기에서는 소리를 낼 수 없어요(힌디어 음성이 없음). 글자 아래의 예시 단어를 누르면 사전에서 그 단어가 열립니다.</span></p>`}
+      <p class="alpha-tip"><svg class="spk" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M4 16l1-4 8-8 3 3-8 8zM11.5 5.5l3 3"/></svg><span><b>글자를 두 번 누르면(더블클릭) 쓰는 순서가 나와요.</b> 모음·자음 46자 모두 한 획씩 그려 보여 줍니다.</span></p>
     </header>
 
     <section class="alpha-sec">
       <h3>모음 <span class="sub">스바라 svara · 13자</span></h3>
-      <p class="alpha-note">단어 첫머리에는 위의 독립 글자를 쓰고, 자음 뒤에서는 아래처럼 모음 기호를 붙여 씁니다(क ka에 붙인 모양). 짧은 모음 a는 자음에 이미 들어 있어서 기호가 없습니다.</p>
+      <p class="alpha-note">모음은 쓰는 모양이 둘입니다. 앞에 자음이 없을 때(단어 첫머리 등)는 <b>큰 글자</b>인 독립 글자를 쓰고, 자음 뒤에서는 <b>모음 기호</b>(마트라)를 자음에 붙입니다. 그런데 한글의 'ㅏ'와 달리, 모음 기호는 대부분 독립 글자와 <b>모양이 전혀 달라서</b> 짝을 따로 외워야 해요. 예: <span lang="sa">इ</span>(i) → <span lang="sa">ि</span>, <span lang="sa">उ</span>(u) → <span lang="sa">ु</span>.</p>
+      <p class="alpha-note"><b>점선 칸</b>에는 모음 기호와, 그 기호를 자음 <span lang="sa">क</span>(ka)에 붙인 모양이 나옵니다. 기호 앞의 점선 동그라미(◌) 자리에 자음이 들어가요. <span lang="sa">ि</span>(i)는 자음 왼쪽에 붙지만 읽기는 자음 다음에 읽습니다(<span lang="sa">कि</span> = k + i).</p>
+      <p class="alpha-note">모양이 이어지는 것도 있어요. <span lang="sa">आ</span>의 오른쪽 세로획이 그대로 ā 기호 <span lang="sa">ा</span>가 되고, <span lang="sa">ओ औ</span>의 기호 <span lang="sa">ो ौ</span>는 그 세로획 위에 갈고리를 얹은 모양입니다. 짧은 a는 자음 글자에 이미 들어 있어서(<span lang="sa">क</span> = ka) 기호가 없습니다.</p>
       <div class="vowel-grid">${ALPHA_VOWELS.map(([i, d, sign, ko, tip]) => `
         <div class="vowel">
           ${alphaCell(i, d, ko, tip)}
-          <button type="button" class="vowel-sign" data-speak="${sign}" title="자음 뒤에 붙인 모양 (눌러서 듣기)"><span lang="sa">${sign}</span><span>k${esc(i)}</span></button>
+          <button type="button" class="vowel-sign" data-speak="${sign}" title="모음 기호와, 자음 क에 붙인 모양 (눌러서 듣기)">${sign.length > 1 ? `<span lang="sa" class="mat">◌${sign.slice(1)}</span><span class="mat-arrow">→</span>` : `<span class="mat-none">기호 없음</span>`}<span lang="sa">${sign}</span><span>k${esc(i)}</span></button>
           <p class="vowel-tip">${esc(tip)}</p>
         </div>`).join("")}
       </div>
@@ -1438,7 +1584,7 @@ function renderAlphabet() {
       <p class="alpha-note">모든 자음에는 짧은 모음 a가 붙어 있어 क는 'ka'로 읽습니다. 가로로는 숨과 목청의 울림이, 세로로는 혀와 입술의 위치가 같습니다.</p>
       <div class="cons-wrap"><table class="cons">
         <thead><tr><th></th>${ALPHA_HEADS.map(([n, how, ko]) => `<th><b>${n}</b><span>${how}</span><span class="ko">${ko}</span></th>`).join("")}</tr></thead>
-        <tbody>${ALPHA_ROWS.map(([name, where, cells]) => `<tr><th scope="row"><b>${name}</b><span>${where}</span><button type="button" class="row-play" data-speak="${cells.map(c => c[1]).join(", ")}"${canSpeak() ? "" : " hidden"}><svg class="spk" viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M3 7.5h3l4-3.5v12l-4-3.5H3z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M13 7a4 4 0 0 1 0 6M15.5 4.8a7 7 0 0 1 0 10.4"/></svg> 줄 듣기</button></th>${cells.map(([i, d, ko]) => `<td>${alphaCell(i, d, ko + " (" + i + "a)")}</td>`).join("")}</tr>`).join("")}</tbody>
+        <tbody>${ALPHA_ROWS.map(([name, where, cells]) => `<tr><th scope="row"><b>${name}</b><span>${where}</span></th>${cells.map(([i, d, ko]) => `<td>${alphaCell(i, d, ko + " (" + i + "a)")}</td>`).join("")}</tr>`).join("")}</tbody>
       </table></div>
       <div class="others">${ALPHA_OTHERS.map(([name, desc, cells]) => `
         <div class="other-group"><h4>${name} <span class="sub">${desc}</span><button type="button" class="row-play" data-speak="${cells.map(c => c[1]).join(", ")}"${canSpeak() ? "" : " hidden"}><svg class="spk" viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M3 7.5h3l4-3.5v12l-4-3.5H3z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M13 7a4 4 0 0 1 0 6M15.5 4.8a7 7 0 0 1 0 10.4"/></svg> 듣기</button></h4>
@@ -1462,7 +1608,7 @@ function renderAlphabet() {
 function showAlphabet(on) {
   $("alphabet").hidden = !on;
   document.querySelectorAll(".dict-view").forEach(el => { el.hidden = on; });
-  $("alpha-btn").textContent = on ? "사전으로" : "자모표 보기";
+  $("alpha-btn").textContent = on ? "사전으로" : "자음+모음 보기";
   $("alpha-btn").setAttribute("aria-pressed", on);
   if (on) { renderAlphabet(); $("alphabet").scrollIntoView({ block: "start" }); }
 }
@@ -2049,7 +2195,7 @@ function renderCount(total) {
   const filteredNow = state.q || state.letter || state.cat !== "all";
   $("count").textContent = filteredNow ? `결과 ${total.toLocaleString()}개` : `핵심 어휘 ${CORE.length}${dictNote}`;
 }
-const BADGE = it => it.src === "core" ? (it.p === "√" ? '<span class="src">어근</span>' : '<span class="src src-ko">한국어</span>')
+const BADGE = it => it.src === "core" ? (it.p === "√" ? '<span class="src">어근</span>' : "")
   : [it.mask & 1 ? "Apte" : it.mask & 2 ? "Apte 합성어" : "", it.mask & 4 ? "MW" : "", it.mask & 8 ? "Edgerton" : ""]
       .filter(Boolean).map(b => `<span class="src">${b}</span>`).join("");
 function renderList({ total, items }) {
@@ -2425,9 +2571,15 @@ function runSearch() {
 }
 $("search-btn").addEventListener("click", runSearch);
 $("alpha-btn").addEventListener("click", () => showAlphabet($("alphabet").hidden));
+$("alphabet").addEventListener("dblclick", e => {
+  const c = e.target.closest("[data-glyph]");
+  if (c) { e.preventDefault(); showStrokePopup(c.dataset.glyph, c.dataset.iast); }
+});
 $("alphabet").addEventListener("click", e => {
   const g = e.target.closest("[data-goto]");
   if (g) { showAlphabet(false); goTo(g.dataset.goto); return; }
+  const re = e.target.closest("[data-replay]");
+  if (re) { const svg = re.querySelector("svg"); svg.replaceWith(svg.cloneNode(true)); return; }   // 새로 넣어야 애니메이션이 처음부터 다시 돎
   const sp = e.target.closest("[data-speak]");
   if (sp) speak(sp.dataset.speak);
 });
