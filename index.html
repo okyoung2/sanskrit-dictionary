@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
 <meta name="description" content="산스크리트어 사전: 한국어 핵심 어휘와 Apte·Monier-Williams·Edgerton 사전 21만 표제어">
 <meta property="og:title" content="산스크리트 소사전">
 <meta property="og:description" content="데바나가리·로마자로 찾는 산스크리트어 사전. 한국어 핵심 어휘 983개, 사전 표제어 21만여 개.">
@@ -253,9 +254,10 @@ html:not(.translated-ltr):not(.translated-rtl) .orig { display: none; }
 .sk-anim path, .sk-frame path { fill: none; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
 .sk-anim path { stroke: var(--ink); }
 @media (prefers-reduced-motion: no-preference) {
-  .sk-anim path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: sk-draw .8s ease-in-out forwards; }
+  /* 차례가 오기 전의 획은 숨김: 숨기지 않으면 둥근 선 끝이 점으로 미리 보임 */
+  .sk-anim path { opacity: 0; stroke-dasharray: 1; stroke-dashoffset: 1; animation: sk-draw .8s ease-in-out forwards; }
 }
-@keyframes sk-draw { to { stroke-dashoffset: 0; } }
+@keyframes sk-draw { from { opacity: 1; stroke-dashoffset: 1; } to { opacity: 1; stroke-dashoffset: 0; } }
 .sk-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 .sk-steps li { display: grid; grid-template-columns: 52px 1.5rem minmax(0, 1fr); gap: 8px; align-items: center; }
 .sk-frame { width: 52px; height: 52px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); }
