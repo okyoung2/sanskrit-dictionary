@@ -141,6 +141,8 @@ footer .iast-inline { font-family: var(--f-iast); }
 .syl .g .m { color: var(--turmeric); font-weight: 700; }
 .syl .t { font-family: var(--f-iast); font-size: 1.05rem; }
 .pron-tip { margin: 0; color: var(--muted); font-size: 0.84rem; }
+.pron-rec { border-left-color: var(--ink); }
+.pron-note { margin: 4px 0 0; padding: 6px 10px; border-left: 3px solid var(--line); color: var(--muted); font-size: 0.8rem; line-height: 1.5; }
 .write { border-top: 1px solid var(--line); padding-top: 14px; }
 .write summary { cursor: pointer; font-weight: 600; font-size: 0.95rem; }
 .write summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
@@ -203,9 +205,33 @@ html:not(.translated-ltr):not(.translated-rtl) .orig { display: none; }
 .orig-sub { font-size: 0.78rem; margin-left: 6px; opacity: 0.8; }
 .orig[open] summary { margin-bottom: 8px; }
 .head-right { display: flex; align-items: center; gap: 12px; }
-#alpha-btn { padding: 6px 14px; }
-#alpha-btn[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+#alpha-btn, #about-btn { padding: 6px 14px; }
+#alpha-btn[aria-pressed="true"], #about-btn[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .alphabet { display: grid; gap: 26px; }
+.head-right { flex-wrap: wrap; justify-content: flex-end; }
+/* 산스크리트어란? */
+.about [lang="sa"] { font-family: var(--f-deva); }
+.about { display: grid; gap: 12px; }
+.about-lead { margin: 0; }
+.about-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: 10px; }
+.about-card { padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.about-card h3, .about-h { margin: 0 0 6px; font-size: 0.95rem; color: var(--ink); }
+.about-card p, .about-card ul { margin: 0; font-size: 0.88rem; }
+.about-card ul { padding-left: 1.1em; display: grid; gap: 4px; }
+.about-card .about-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.about-h { margin-top: 10px; }
+.about-story { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; font-size: 0.9rem; }
+.about-src { margin: 4px 0 0; font-size: 0.78rem; color: var(--muted); }
+.ab-table { overflow-x: auto; }
+.ab-table table { border-collapse: collapse; font-size: 0.9rem; }
+.ab-table th, .ab-table td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; vertical-align: middle; }
+.ab-table thead th { color: var(--muted); font-weight: 600; font-size: 0.82rem; }
+.ab-w { border: 0; background: none; padding: 0; font-family: var(--f-deva); font-size: 1.25rem; color: var(--ink); }
+.ab-w:hover { text-decoration: underline; }
+.ab-spk { border: 0; background: none; padding: 2px; color: var(--muted); line-height: 0; vertical-align: middle; margin-left: 4px; }
+.ab-spk:hover { color: var(--ink); }
+.ab-table i { font-family: var(--f-iast); }
+.ab-h { display: block; font-size: 0.8rem; color: var(--muted); }
 .alpha-head { display: grid; gap: 6px; justify-content: start; }
 .alpha-head h2 { margin: 0; font-size: 1.35rem; text-wrap: balance; }
 .alpha-head h2 span { font-family: var(--f-deva); font-weight: 400; color: var(--ink); margin-left: 8px; }
@@ -304,7 +330,7 @@ footer p { margin: 0; }
   </div>
   <header translate="no" lang="ko">
     <h1><span class="deva">शब्दकोश</span> 산스크리트 소사전</h1>
-    <div class="head-right"><span class="count" id="count"></span><button type="button" class="btn" id="alpha-btn" aria-pressed="false">자음+모음 보기</button></div>
+    <div class="head-right"><span class="count" id="count"></span><button type="button" class="btn" id="about-btn" aria-pressed="false">산스크리트어란?</button><button type="button" class="btn" id="alpha-btn" aria-pressed="false">자음+모음 보기</button></div>
   </header>
 
   <div class="searchbar" translate="no" lang="ko">
@@ -321,8 +347,10 @@ footer p { margin: 0; }
     <article class="detail" id="detail" aria-live="polite"></article>
   </div>
   <section class="alphabet" id="alphabet" hidden translate="no" lang="ko" aria-label="데바나가리 자모표"></section>
+  <section class="about" id="about" hidden translate="no" lang="ko" aria-label="산스크리트어란?"></section>
 
   <footer translate="no" lang="ko"><p>표제어는 산스크리트 자모 순서(<span class="iast-inline">a ā i ī u ū ṛ e ai o au · k kh g gh ṅ · c ch j jh ñ · ṭ ṭh ḍ ḍh ṇ · t th d dh n · p ph b bh m · y r l v · ś ṣ s h</span>)로 정렬됩니다. 명사는 어간형으로 싣고, 주격형이 다른 경우 참고란에 적었습니다.</p>
+    <p>일부 낱말(23개)의 녹음: Wikimedia Commons(Lingua Libre 등), 녹음한 분들의 CC BY-SA 4.0·CC0 자료. 녹음이 없는 낱말은 기기의 힌디어 음성으로 읽습니다.</p>
     <p>사전 데이터: V. S. Apte, <em>The Practical Sanskrit-English Dictionary</em> (1890) · M. Monier-Williams, <em>A Sanskrit-English Dictionary</em> (1899) · F. Edgerton, <em>Buddhist Hybrid Sanskrit Dictionary</em> (1953). <a href="https://www.sanskrit-lexicon.uni-koeln.de/" target="_blank" rel="noopener">Cologne Digital Sanskrit Dictionaries</a> 디지털판, CC BY-SA 4.0. 사전 표제어의 데바나가리·한글 음역은 자동 변환했고, Apte 합성어의 표제어 형태는 연성 규칙으로 자동으로 만든 것입니다.</p></footer>
 </div>
 
@@ -1490,6 +1518,7 @@ function pronBlock(en) {
     <div class="syl" aria-label="음절과 장단">${syl.map(s =>
       `<span class="s ${s.heavy ? "g" : "l"}" title="${s.heavy ? "긴 음절(guru)" : "짧은 음절(laghu)"}"><span class="m">${s.heavy ? "–" : "⏑"}</span><span class="t">${esc(s.iast)}</span></span>`).join("")}</div>
     ${tips.length ? `<p class="pron-tip">${esc(tips.join(" · "))}</p>` : ""}
+    ${REC[en.d] && !window.claude?.use ? `<p class="pron-note pron-rec">듣기는 <b>실제 사람이 녹음한 소리</b>입니다 — 녹음: ${esc(REC[en.d][1])}, Wikimedia Commons, ${esc(REC[en.d][2])}</p>` : canSpeak() ? `<p class="pron-note">듣기는 산스크리트어 음성이 없어 <b>힌디어 음성</b>으로 읽습니다. 힌디어는 낱말 끝과 중간의 a를 빼고 읽는 일이 많아 실제와 다르게 들릴 수 있어요(예: aṣṭāṅgamārga → 아슈탕그마르그). 바른 발음은 위의 로마자와 한글을 따르세요.</p>` : ""}
   </div>`;
 }
 
@@ -1509,7 +1538,38 @@ if ("speechSynthesis" in window) {
 }
 const canSpeak = () => speechReady || !window.claude?.use;
 let ttsAudio = null;
+// 실제 사람이 녹음한 산스크리트어 낱말(Wikimedia Commons·Lingua Libre). 낱말 → [mp3 주소, 녹음한 사람, 이용 조건]
+const REC = {
+  "अग्नि": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e3/LL-Q11059_%28san%29-Sriveenkat-%E0%A4%85%E0%A4%97%E0%A5%8D%E0%A4%A8%E0%A4%BF.wav/LL-Q11059_%28san%29-Sriveenkat-%E0%A4%85%E0%A4%97%E0%A5%8D%E0%A4%A8%E0%A4%BF.wav.mp3", "Sriveenkat", "CC BY-SA 4.0"],
+  "अधिकार": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/5/51/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%85%E0%A4%A7%E0%A4%BF%E0%A4%95%E0%A4%BE%E0%A4%B0.wav/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%85%E0%A4%A7%E0%A4%BF%E0%A4%95%E0%A4%BE%E0%A4%B0.wav.mp3", "Intobesa", "CC BY-SA 4.0"],
+  "अहम्": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/4/42/LL-Q11059_%28san%29-Sriveenkat-%E0%A4%85%E0%A4%B9%E0%A4%AE%E0%A5%8D.wav/LL-Q11059_%28san%29-Sriveenkat-%E0%A4%85%E0%A4%B9%E0%A4%AE%E0%A5%8D.wav.mp3", "Sriveenkat", "CC BY-SA 4.0"],
+  "ऋतु": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ef/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%8B%E0%A4%A4%E0%A5%81.wav/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%8B%E0%A4%A4%E0%A5%81.wav.mp3", "Intobesa", "CC BY-SA 4.0"],
+  "एक": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/8/85/LL-Q11059_%28san%29-Pcxr-%E0%A4%8F%E0%A4%95.wav/LL-Q11059_%28san%29-Pcxr-%E0%A4%8F%E0%A4%95.wav.mp3", "Pcxr", "CC0"],
+  "कोश": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c2/LL-Q11059_%28san%29-Sriveenkat-%E0%A4%95%E0%A5%8B%E0%A4%B6.wav/LL-Q11059_%28san%29-Sriveenkat-%E0%A4%95%E0%A5%8B%E0%A4%B6.wav.mp3", "Sriveenkat", "CC BY-SA 4.0"],
+  "जल": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d2/LL-Q11059_%28san%29-Sriveenkat-%E0%A4%9C%E0%A4%B2.wav/LL-Q11059_%28san%29-Sriveenkat-%E0%A4%9C%E0%A4%B2.wav.mp3", "Sriveenkat", "CC BY-SA 4.0"],
+  "तारा": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b3/LL-Q11059_%28san%29-Sriveenkat-%E0%A4%A4%E0%A4%BE%E0%A4%B0%E0%A4%BE.wav/LL-Q11059_%28san%29-Sriveenkat-%E0%A4%A4%E0%A4%BE%E0%A4%B0%E0%A4%BE.wav.mp3", "Sriveenkat", "CC BY-SA 4.0"],
+  "दर्शन": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/6/67/LL-Q11059_%28san%29-Sriveenkat-%E0%A4%A6%E0%A4%B0%E0%A5%8D%E0%A4%B6%E0%A4%A8.wav/LL-Q11059_%28san%29-Sriveenkat-%E0%A4%A6%E0%A4%B0%E0%A5%8D%E0%A4%B6%E0%A4%A8.wav.mp3", "Sriveenkat", "CC BY-SA 4.0"],
+  "दशन्": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/f/fa/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%A6%E0%A4%B6%E0%A4%A8%E0%A5%8D.wav/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%A6%E0%A4%B6%E0%A4%A8%E0%A5%8D.wav.mp3", "Intobesa", "CC BY-SA 4.0"],
+  "दिव्य": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/1/12/LL-Q11059_%28san%29-Sriveenkat-%E0%A4%A6%E0%A4%BF%E0%A4%B5%E0%A5%8D%E0%A4%AF.wav/LL-Q11059_%28san%29-Sriveenkat-%E0%A4%A6%E0%A4%BF%E0%A4%B5%E0%A5%8D%E0%A4%AF.wav.mp3", "Sriveenkat", "CC BY-SA 4.0"],
+  "दोष": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f7/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%A6%E0%A5%8B%E0%A4%B7.wav/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%A6%E0%A5%8B%E0%A4%B7.wav.mp3", "Intobesa", "CC BY-SA 4.0"],
+  "द्वेष": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c7/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%A6%E0%A5%8D%E0%A4%B5%E0%A5%87%E0%A4%B7.wav/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%A6%E0%A5%8D%E0%A4%B5%E0%A5%87%E0%A4%B7.wav.mp3", "Intobesa", "CC BY-SA 4.0"],
+  "प्रकृति": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/b/bf/LL-Q11059_%28san%29-Sriveenkat-%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A4%95%E0%A5%83%E0%A4%A4%E0%A4%BF.wav/LL-Q11059_%28san%29-Sriveenkat-%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A4%95%E0%A5%83%E0%A4%A4%E0%A4%BF.wav.mp3", "Sriveenkat", "CC BY-SA 4.0"],
+  "प्रीति": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/6/60/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A5%80%E0%A4%A4%E0%A4%BF.wav/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A5%80%E0%A4%A4%E0%A4%BF.wav.mp3", "Intobesa", "CC BY-SA 4.0"],
+  "प्रेमन्": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b8/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A5%87%E0%A4%AE%E0%A4%A8%E0%A5%8D.wav/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A5%87%E0%A4%AE%E0%A4%A8%E0%A5%8D.wav.mp3", "Intobesa", "CC BY-SA 4.0"],
+  "बोधिसत्त्व": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d1/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%AC%E0%A5%8B%E0%A4%A7%E0%A4%BF%E0%A4%B8%E0%A4%A4%E0%A5%8D%E0%A4%A4%E0%A5%8D%E0%A4%B5.wav/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%AC%E0%A5%8B%E0%A4%A7%E0%A4%BF%E0%A4%B8%E0%A4%A4%E0%A5%8D%E0%A4%A4%E0%A5%8D%E0%A4%B5.wav.mp3", "Intobesa", "CC BY-SA 4.0"],
+  "ब्रह्मा": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/a/ad/LL-Q11059_%28san%29-Saurabh_Saha_%28Thesaurabhsaha%29-%E0%A4%AC%E0%A5%8D%E0%A4%B0%E0%A4%B9%E0%A5%8D%E0%A4%AE%E0%A4%BE.wav/LL-Q11059_%28san%29-Saurabh_Saha_%28Thesaurabhsaha%29-%E0%A4%AC%E0%A5%8D%E0%A4%B0%E0%A4%B9%E0%A5%8D%E0%A4%AE%E0%A4%BE.wav.mp3", "Saurabh Saha", "CC BY-SA 4.0"],
+  "मण्डल": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a3/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%AE%E0%A4%A3%E0%A5%8D%E0%A4%A1%E0%A4%B2.wav/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%AE%E0%A4%A3%E0%A5%8D%E0%A4%A1%E0%A4%B2.wav.mp3", "Intobesa", "CC BY-SA 4.0"],
+  "माया": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b7/LL-Q11059_%28san%29-Sriveenkat-%E0%A4%AE%E0%A4%BE%E0%A4%AF%E0%A4%BE.wav/LL-Q11059_%28san%29-Sriveenkat-%E0%A4%AE%E0%A4%BE%E0%A4%AF%E0%A4%BE.wav.mp3", "Sriveenkat", "CC BY-SA 4.0"],
+  "रक्त": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/f/fe/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%B0%E0%A4%95%E0%A5%8D%E0%A4%A4.wav/LL-Q11059_%28san%29-Intobesa_%28%E5%92%BD%E9%A0%AD%E3%81%B9%E3%81%95%29-%E0%A4%B0%E0%A4%95%E0%A5%8D%E0%A4%A4.wav.mp3", "Intobesa", "CC BY-SA 4.0"],
+  "गज": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/a/ab/Sa-%E0%A4%97%E0%A4%9C.ogg/Sa-%E0%A4%97%E0%A4%9C.ogg.mp3", "Sriveenkat", "CC BY-SA 4.0"],
+  "राम": ["https://upload.wikimedia.org/wikipedia/commons/transcoded/2/27/Sa-%E0%A4%B0%E0%A4%BE%E0%A4%AE.oga/Sa-%E0%A4%B0%E0%A4%BE%E0%A4%AE.oga.mp3", "Josh Aadi", "CC BY-SA 4.0"],
+};
 function speak(text) {
+  if (REC[text] && !window.claude?.use) {
+    try { speechSynthesis.cancel(); } catch {}
+    try { ttsAudio?.pause(); ttsAudio = new Audio(REC[text][0]); ttsAudio.play().catch(() => {}); } catch {}
+    return;
+  }
   if (speechReady) {
     try {
       speechSynthesis.cancel();
@@ -1823,7 +1883,66 @@ function renderAlphabet() {
       </div>
     </section>`;
 }
+// ── 산스크리트어란? ──
+// 한국 불교 용어 가운데 산스크리트어 소리를 한자로 옮긴 말: [한국어(한자), IAST, 설명]
+const KO_BUD = [["반야(般若)", "prajñā", "지혜"], ["열반(涅槃)", "nirvāṇa", "번뇌의 불이 꺼진 상태"], ["보리(菩提)", "bodhi", "깨달음"],
+  ["바라밀(波羅蜜)", "pāramitā", "완성, 저 언덕에 이름"], ["찰나(刹那)", "kṣaṇa", "아주 짧은 순간"], ["나락(奈落)", "naraka", "지옥"],
+  ["사리(舍利)", "śarīra", "몸; 부처·스님의 유골"], ["만다라(曼荼羅)", "maṇḍala", "원; 깨달음의 세계를 그린 그림"], ["불타(佛陀)·부처", "buddha", "깨달은 이"],
+  ["선(禪)", "dhyāna", "선정, 명상 - 선나(禪那)의 줄임"], ["승가(僧伽)", "saṅgha", "수행 공동체 - '승(僧)'이 여기서 나옴"], ["탑(塔)", "stūpa", "유골을 모신 탑 - 탑파(塔婆)의 줄임"]];
+const SPK_ICON = `<svg class="spk" viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M3 7.5h3l4-3.5v12l-4-3.5H3z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M13 7a4 4 0 0 1 0 6M15.5 4.8a7 7 0 0 1 0 10.4"/></svg>`;
+let aboutDone = false;
+function renderAbout() {
+  if (aboutDone) return;
+  aboutDone = true;
+  const rows = KO_BUD.map(([ko, i, note]) => {
+    const e = CORE_BY_IAST.get(i);
+    return `<tr><th>${esc(ko)}</th>
+      <td>${e ? `<button type="button" class="ab-w" data-goto="${e.key}" title="사전에서 보기"><span lang="sa">${e.d}</span></button>` : ""}
+        ${e ? `<button type="button" class="ab-spk" data-speak="${e.d}" aria-label="${esc(i)} 듣기"${canSpeak() ? "" : " hidden"}>${SPK_ICON}</button>` : ""}</td>
+      <td><i>${esc(i)}</i><span class="ab-h">${e ? esc(e.h) : ""}</span></td><td>${esc(note)}</td></tr>`;
+  }).join("");
+  $("about").innerHTML = `
+    <header class="alpha-head"><h2>산스크리트어란? <span lang="sa">संस्कृतम्</span></h2><p>지금의 자리 · 문자 · 역사 이야기 · 한국 불교 속 산스크리트어</p></header>
+    <p class="about-lead"><b>산스크리트어(<span lang="sa">संस्कृतम्</span>, saṃskṛtam)</b>는 인도유럽어족 인도아리아어파의 고전어로, 힌두교·불교·자이나교의 경전과 인도의 학문·문학을 담아 온 말입니다. 이름은 <span lang="sa">सम्</span> saṃ(함께, 잘)과 <span lang="sa">कृत</span> kṛta(만들어진)를 합친 말로 '잘 다듬어진, 완성된'이라는 뜻입니다.</p>
+    <div class="about-grid">
+      <section class="about-card"><h3>지금의 자리</h3><ul>
+        <li>인도 헌법이 정한 22개 언어 가운데 하나</li>
+        <li>우타라칸드주(2010년)와 히마찰프라데시주(2019년)의 제2 공용어</li>
+        <li>2011년 인도 인구조사에서 모어라고 답한 사람은 24,821명. 일상어로 쓰는 사람은 거의 없고, 종교적 의미로 그렇게 답한 경우가 많다는 분석이 있음</li></ul></section>
+      <section class="about-card"><h3>쓰이는 곳</h3><ul>
+        <li>힌두교 의례와 베다 낭송</li>
+        <li>대승 불교 경전 — 한자로 옮겨져 한국에 전해짐</li>
+        <li>자이나교 경전, 요가·아유르베다·철학의 용어</li></ul></section>
+      <section class="about-card"><h3>문자</h3>
+        <p>정해진 고유 문자 없이 지역마다 그 지방 문자로 적어 왔습니다. 처음에는 브라흐미 문자(기원전 1세기 무렵)로, 뒤에는 샤라다·그란타 등으로 적었고, 오늘날에는 주로 <b>데바나가리</b>로 적습니다.</p>
+        <p class="about-links"><button type="button" class="btn" data-about="alpha">자모표 보기</button></p></section>
+    </div>
+    <h3 class="about-h">역사 이야기</h3>
+    <ul class="about-story">
+      <li><b>입으로 전해진 베다</b> — 가장 오래된 경전 리그베다는 기원전 1500~1200년 무렵 지어졌고, 오랫동안 글 없이 외워서 전해졌습니다. 베다 낭송 전통은 유네스코 인류무형문화유산(2003년 선정, 2008년 등재)이며, 천여 개에 이르던 낭송 갈래 가운데 13개만 남아 있습니다.</li>
+      <li><b>파니니 문법</b> — 기원전 4세기 무렵 파니니가 지은 문법서 <span lang="sa">अष्टाध्यायी</span>(아슈타디야이)는 짧은 규칙들로 말 전체를 설명해, 고전 산스크리트어의 기준이 되었습니다.</li>
+      <li><b>경전을 따라 동쪽으로</b> — 5세기 초 법현, 7세기 현장(경전 657부)이 산스크리트어 경전을 중국으로 가져가 한문으로 옮겼고, 이 한문 불경이 한국으로 전해졌습니다. 그래서 아래처럼 산스크리트어 소리를 한자로 옮긴 말이 오늘날 우리말에 남아 있습니다.</li>
+      <li><b>타밀 땅의 그란타 문자</b> — 남인도 타밀 지방에서는 산스크리트어를 적으려고 그란타 문자를 썼습니다. 지금 타밀 글자의 <span lang="ta">ஜ ஷ ஸ ஹ</span>도 이 전통에서 온 것입니다.</li>
+      <li><b>인도유럽어의 발견</b> — 1786년 윌리엄 존스가 아시아 협회 강연에서 산스크리트어·그리스어·라틴어가 한 뿌리에서 나왔다고 지적했고, 이것이 인도유럽어 비교 연구의 출발점으로 꼽힙니다.</li>
+    </ul>
+    <h3 class="about-h">한국 불교 속 산스크리트어</h3>
+    <p class="alpha-note">산스크리트어 소리를 한자로 옮긴 말들입니다. 데바나가리 낱말을 누르면 사전에서 열리고, 스피커를 누르면 소리를 들을 수 있습니다. (듣기는 힌디어 음성이라 끝의 a가 빠져 들릴 수 있어요. 바른 발음은 로마자·한글을 따르세요.)</p>
+    <div class="ab-table"><table>
+      <thead><tr><th>우리말</th><th>산스크리트어</th><th>로마자 · 한글</th><th>뜻</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>
+    <p class="about-src">출처: Wikipedia 'Sanskrit'·'Sanskrit revival'·'William Jones (philologist)', UNESCO 'Tradition of Vedic chanting', 2011년 인도 인구조사 보도. 불교 용어의 산스크리트어 뜻은 이 사전의 핵심 어휘와 같습니다.</p>`;
+}
+function showAbout(on) {
+  if (on && !$("alphabet").hidden) showAlphabet(false);
+  if (on) renderAbout();
+  $("about").hidden = !on;
+  document.querySelectorAll(".dict-view").forEach(el => { el.hidden = on; });
+  $("about-btn").textContent = on ? "사전으로" : "산스크리트어란?";
+  $("about-btn").setAttribute("aria-pressed", on);
+  if (on) $("about").scrollIntoView({ block: "start" });
+}
 function showAlphabet(on) {
+  if (on && !$("about").hidden) showAbout(false);
   $("alphabet").hidden = !on;
   document.querySelectorAll(".dict-view").forEach(el => { el.hidden = on; });
   $("alpha-btn").textContent = on ? "사전으로" : "자음+모음 보기";
@@ -2739,6 +2858,7 @@ let typing;
 $("q").addEventListener("input", e => {
   clearTimeout(typing);
   if (!$("alphabet").hidden) showAlphabet(false);
+  if (!$("about").hidden) showAbout(false);
   typing = setTimeout(() => { state.q = e.target.value; state.sel = null; state.limit = PAGE_LIMIT; render(); }, 150);
 });
 // 분류·첫 글자 버튼은 '둘러보기'라서 검색어를 지우고 그 분류 전체를 보여 줌
@@ -2783,12 +2903,22 @@ $("detail").addEventListener("click", e => {
 function runSearch() {
   clearTimeout(typing);
   if (!$("alphabet").hidden) showAlphabet(false);
+  if (!$("about").hidden) showAbout(false);
   state.q = $("q").value; state.cat = "all"; state.letter = ""; state.limit = PAGE_LIMIT; state.sel = null;
   renderVarna(); lastSel = null; render(); scrollToCurrent();
   if (matchMedia("(max-width: 760px)").matches) $("list").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 $("search-btn").addEventListener("click", runSearch);
 $("alpha-btn").addEventListener("click", () => showAlphabet($("alphabet").hidden));
+$("about-btn").addEventListener("click", () => showAbout($("about").hidden));
+$("about").addEventListener("click", e => {
+  const g = e.target.closest("[data-goto]");
+  if (g) { showAbout(false); goTo(g.dataset.goto); return; }
+  const a = e.target.closest("[data-about]");
+  if (a) { showAlphabet(true); return; }
+  const sp = e.target.closest("[data-speak]");
+  if (sp) speak(sp.dataset.speak);
+});
 $("alphabet").addEventListener("dblclick", e => {
   const c = e.target.closest("[data-glyph]");
   if (c) { e.preventDefault(); showStrokePopup(c.dataset.glyph, c.dataset.iast); }
